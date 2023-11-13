@@ -24,6 +24,23 @@ public class Utilisateur {
     }
 
     @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.ip);
+        hash = 97 * hash + Objects.hashCode(this.nomUtilisateur);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof Utilisateur)) {
+            return false;
+        }
+        Utilisateur other = (Utilisateur) obj;
+        return this.ip.equals(other.ip) && this.nomUtilisateur.equals(other.nomUtilisateur);
+    }
+
+    @Override
     public String toString() {
         return "Utilisateur{" + "ip=" + ip + ", nomUtilisateur=" + nomUtilisateur + '}';
     }

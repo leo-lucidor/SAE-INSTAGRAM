@@ -17,13 +17,30 @@ public class Messagerie {
         this.utilisateurs.add(erwan);
         Salon salon = new Salon("salon", "192.168.1.1", this.utilisateurs);
         this.salons.add(salon);
-        System.out.println(this.salons);
+        // System.out.println(this.salons);
+    }
+
+    public List<Salon> getSalons() {
+        return salons;
+    }
+
+    public List<Utilisateur> getUtilisateurs() {
+        return utilisateurs;
+    }
+
+    public void setSalons(List<Salon> salons) {
+        this.salons = salons;
+    }
+
+    public void setUtilisateurs(List<Utilisateur> utilisateurs) {
+        this.utilisateurs = utilisateurs;
     }
 
     public static void clearScreen() {  
         System.out.print("\033[H\033[2J");  
         System.out.flush();  
     }  
+
     public static void main(String[] args) {
         Messagerie messagerie = new Messagerie();
         // IP ou nom
@@ -38,5 +55,32 @@ public class Messagerie {
         clearScreen();
         System.out.println("votre ip : "+ip);
         System.out.println("votre nom d'utilisateur : "+nom);
+
+        // connexion
+        boolean connexion = false;
+        List<Utilisateur> lesUtilisateurs = messagerie.getUtilisateurs();
+        for(int i=0; i<lesUtilisateurs.size(); i++) {
+            if(lesUtilisateurs.get(i).getIp().equals(ip) || lesUtilisateurs.get(i).getNomUtilisateur().equals(nom)) {
+                connexion = true;
+                System.out.println("Connexion réussie");
+            }
+            if(i == lesUtilisateurs.size()-1) {
+                System.out.println("Connexion échouée");
+            }
+        }
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace(); 
+        }
+
+        // choix du salon
+        clearScreen();
+        if(connexion){
+            for(int i=0; i<messagerie.getSalons().size(); i++) {
+            System.out.println("Salon "+i+" : "+messagerie.getSalons().get(i).getNomSalon());
+            }
+        }
     }
 }
