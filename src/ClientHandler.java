@@ -27,14 +27,14 @@ public class ClientHandler extends Thread{
 
         // On affiche les salons
         if (salons.size() > 0) {
-            out.writeUTF(BibliothequeStyle.ANSI_CYAN +BibliothequeStyle.SOULIGNAGE + "Salons disponibles :"+ BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
+            out.writeUTF(BibliothequeStyle.ANSI_CYAN +BibliothequeStyle.SOULIGNAGE + BibliothequeString.SALON_DISPONIBLE + BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
             for (Salon salon : salons) {
-                out.writeUTF("\u001b[32m-"+salon+""+ BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
+                out.writeUTF(BibliothequeStyle.ANSI_GREEN +salon+""+ BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
             }
         } else {
-            out.writeUTF(BibliothequeStyle.ANSI_CYAN + "Il n'y a pas de salon, créez-en un !"+ BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
+            out.writeUTF(BibliothequeStyle.ANSI_CYAN + BibliothequeString.NOTIFICATION_PAS_DE_SALON + BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
         }
-        out.writeUTF(BibliothequeStyle.ANSI_CYAN + "(si vous faites /quit ici, vous serez déconnecté)"+ BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
+        out.writeUTF("" + BibliothequeStyle.ANSI_CYAN + BibliothequeString.REMARQUE_HELP + BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
     }
 
 
@@ -139,20 +139,10 @@ public class ClientHandler extends Thread{
         out.writeUTF(BibliothequeStyle.ANSI_CYAN + BibliothequeString.NOTIFICATION_SALON + nomSalon+ BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
     }
 
-    public DataInputStream dis(Client client) throws IOException{
-        DataInputStream res = new DataInputStream(client.getSocket().getInputStream());
-        return res;
-    }
-
-    public DataOutputStream dos(Client client) throws IOException{
-        DataOutputStream res = new DataOutputStream(client.getSocket().getOutputStream());
-        return res;
-    }
-
     public void run(){
         try {
-            DataInputStream in = dis(client);
-            DataOutputStream out = dos(client);
+            DataInputStream in = new DataInputStream(client.getSocket().getInputStream());
+            DataOutputStream out = new DataOutputStream(client.getSocket().getOutputStream());
             // On demande le nom du client
             String nomClient = verifName(in,out);
             // On demande le nom du salon
