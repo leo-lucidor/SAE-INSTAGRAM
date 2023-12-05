@@ -2,46 +2,42 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.List;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter; 
+import java.time.LocalDateTime; 
 
-public class ClientHandler extends Thread {
+public class ClientHandler implements Runnable{
     private Client client;
     private List<Client> clients;
     private List<Salon> salons;
 
-    public ClientHandler(Client client, List<Client> clients, List<Salon> salons) {
+    public ClientHandler(Client client, List<Client> clients, List<Salon> salons){
         this.client = client;
         this.clients = clients;
-        this.salons = salons;
+        this.salons = salons; 
     }
 
-    public void clearTerminalClient(DataOutputStream out) throws IOException {
+    public void clearTerminalClient(DataOutputStream out) throws IOException{
         out.writeUTF(BibliothequeString.CLEAR);
     }
 
-    public void afficherSalons(DataOutputStream out) throws IOException {
+    public void afficherSalons(DataOutputStream out) throws IOException{
         clearTerminalClient(out);
 
         // On affiche les salons
         if (salons.size() > 0) {
-            out.writeUTF(BibliothequeStyle.ANSI_CYAN + BibliothequeStyle.SOULIGNAGE
-                    + BibliothequeString.SALON_DISPONIBLE + BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
+            out.writeUTF(BibliothequeStyle.ANSI_CYAN +BibliothequeStyle.SOULIGNAGE + BibliothequeString.SALON_DISPONIBLE + BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
             for (Salon salon : salons) {
-                out.writeUTF(BibliothequeStyle.ANSI_GREEN + salon + "" + BibliothequeStyle.ANSI_RESET
-                        + BibliothequeString.VIDE);
+                out.writeUTF(BibliothequeStyle.ANSI_GREEN +salon+""+ BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
             }
         } else {
-            out.writeUTF(BibliothequeStyle.ANSI_CYAN + BibliothequeString.NOTIFICATION_PAS_DE_SALON
-                    + BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
+            out.writeUTF(BibliothequeStyle.ANSI_CYAN + BibliothequeString.NOTIFICATION_PAS_DE_SALON + BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
         }
-        out.writeUTF("" + BibliothequeStyle.ANSI_CYAN + BibliothequeString.REMARQUE_HELP + BibliothequeStyle.ANSI_RESET
-                + BibliothequeString.VIDE);
+        out.writeUTF("" + BibliothequeStyle.ANSI_CYAN + BibliothequeString.REMARQUE_HELP + BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
     }
 
-    public String verifName(DataInputStream in, DataOutputStream out) throws IOException {
+
+    public String verifName(DataInputStream in, DataOutputStream out) throws IOException{
         // On récupère le nom du client et on vérifie si il est déjà utilisé
         Boolean isNameSet = false;
         String nomClient = BibliothequeString.VIDE;
@@ -70,7 +66,7 @@ public class ClientHandler extends Thread {
         return nomClient;
     }
 
-    public void changerSalon(DataInputStream in, DataOutputStream out) throws IOException {
+    public void changerSalon(DataInputStream in, DataOutputStream out) throws IOException{
         // On récupère le nom du salon et on vérifie si il existe
         // si il existe, on vérifie si le client est déjà dedans
         // si il n'existe pas, on le crée
@@ -97,10 +93,10 @@ public class ClientHandler extends Thread {
 
                 // si il y existe des salons
                 if (salons.size() > 0) {
-                    // si le salon existe déja
+                    //si le salon existe déja
                     Boolean isSalonExist = false;
-                    for (Salon salon : this.salons) {
-                        if (salon.getNomSalon().equals(nomSalon)) {
+                    for (Salon salon: this.salons){
+                        if (salon.getNomSalon().equals(nomSalon)){
                             isSalonExist = true;
                             for (Client client : clients) {
                                 if (client.getSocket() == this.client.getSocket()) {
@@ -139,20 +135,19 @@ public class ClientHandler extends Thread {
                 }
             }
         }
-        out.writeUTF(BibliothequeStyle.ANSI_CYAN + BibliothequeString.NOTIFICATION_SALON + nomSalon
-                + BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
+        out.writeUTF(BibliothequeStyle.ANSI_CYAN + BibliothequeString.NOTIFICATION_SALON + nomSalon+ BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
     }
 
-    public void run() {
+    public void run(){
         try {
             DataInputStream in = new DataInputStream(client.getSocket().getInputStream());
             DataOutputStream out = new DataOutputStream(client.getSocket().getOutputStream());
             // On demande le nom du client
-            String nomClient = verifName(in, out);
+            String nomClient = verifName(in,out);
             // On demande le nom du salon
-            changerSalon(in, out);
-
-            while (true) {
+            changerSalon(in,out);
+            
+            while(true){
                 // DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd HH:mm");
 
@@ -160,60 +155,52 @@ public class ClientHandler extends Thread {
                 // On lit le message envoyé par le client
                 String message = in.readUTF();
                 if (!message.startsWith("/")) {
-                    String msg_a_envoyer = dtf.format(now) + " [" + this.client.getSalon() + "] " + nomClient + " - "
-                            + message;
+                    String msg_a_envoyer = dtf.format(now)+ " ["+this.client.getSalon()+"] "+nomClient+ " - " + message;
                     System.out.println(msg_a_envoyer);
 
                     // message privé -> on envoie le message uniquement au client mentionné
                     boolean contientEspace = false;
-                    for (int i = 0; i < message.length(); i++) {
+                    for (int i=0; i<message.length(); i++) {
                         if (message.charAt(i) == ' ') {
                             contientEspace = true;
                         }
                     }
                     if (message.startsWith("@") && contientEspace) {
-                        String pseudo = message.substring(message.indexOf("@") + 1, message.indexOf(" "));
-                        for (Client client : clients) {
+                        String pseudo = message.substring(message.indexOf("@")+1, message.indexOf(" "));
+                        for (Client client: clients) {
                             if (pseudo.equals(client.getNameClient())) {
                                 DataOutputStream out3 = new DataOutputStream(client.getSocket().getOutputStream());
-                                out3.writeUTF("MP" + this.client.getNameClient() + " vous chuchotte : "
-                                        + message.substring(message.indexOf(" ") + 1));
+                                out3.writeUTF("MP" + this.client.getNameClient() + " vous chuchotte : " + message.substring(message.indexOf(" ")+1));
                             }
                         }
-                    } else {
-
+                    }else{
+                        
                         // if (message.startsWith("!follow") && contientEspace) {
-                        // String pseudo = message.substring(message.indexOf("!follow")+8,
-                        // message.indexOf(" "));
-                        // for (Client client: clients) {
-                        // DataOutputStream out7 = new
-                        // DataOutputStream(client.getSocket().getOutputStream());
-                        // out7.writeUTF("res = " + pseudo.equals(client.getNameClient()) + " pseudo " +
-                        // pseudo + " client " + client.getNameClient());
-                        // if (pseudo.equals(client.getNameClient())) {
-                        // DataOutputStream out3 = new
-                        // DataOutputStream(client.getSocket().getOutputStream());
-                        // out3.writeUTF("MP" + this.client.getNameClient() + " vous suit");
-                        // if (this.followers.containsKey(client.getNameClient())){
-                        // this.followers.put(client.getNameClient(),
-                        // this.followers.get(client.getNameClient())+1);
-                        // }else{
-                        // this.followers.put(client.getNameClient(), 1);
-                        // }
-                        // }
-                        // }
+                        //     String pseudo = message.substring(message.indexOf("!follow")+8, message.indexOf(" "));
+                        //     for (Client client: clients) {
+                        //         DataOutputStream out7  = new DataOutputStream(client.getSocket().getOutputStream());
+                        //         out7.writeUTF("res = " + pseudo.equals(client.getNameClient()) + " pseudo " + pseudo + " client " + client.getNameClient());
+                        //         if (pseudo.equals(client.getNameClient())) {
+                        //             DataOutputStream out3 = new DataOutputStream(client.getSocket().getOutputStream());
+                        //             out3.writeUTF("MP" + this.client.getNameClient() + " vous suit");
+                        //             if (this.followers.containsKey(client.getNameClient())){
+                        //                 this.followers.put(client.getNameClient(), this.followers.get(client.getNameClient())+1);
+                        //             }else{
+                        //                 this.followers.put(client.getNameClient(), 1);
+                        //             }
+                        //         }
+                        //     }
                         // }
                         // else {
-                        // On envoie le message à tous les clients
-                        for (Client client : clients) {
-                            Socket keySocket = client.getSocket();
-                            if (keySocket != this.client.getSocket()
-                                    && client.getSalon().equals(this.client.getSalon())) {
-                                DataOutputStream out2 = new DataOutputStream(keySocket.getOutputStream());
-                                out2.writeUTF(msg_a_envoyer);
+                            // On envoie le message à tous les clients
+                            for (Client client : clients) {
+                                Socket keySocket = client.getSocket();
+                                if (keySocket != this.client.getSocket() && client.getSalon().equals(this.client.getSalon())) {
+                                    DataOutputStream out2 = new DataOutputStream(keySocket.getOutputStream());
+                                    out2.writeUTF(msg_a_envoyer);
+                                }
                             }
                         }
-                    }
                 } else if (message.startsWith("/")) {
 
                     switch (message) {
@@ -226,8 +213,7 @@ public class ClientHandler extends Thread {
                             String salon_du_client = this.client.getSalon();
                             for (Salon salon : salons) {
                                 if (salon.getNomSalon().equals(salon_du_client)) {
-                                    out.writeUTF("Le salon " + salon_du_client + " est ouvert depuis "
-                                            + salon.tempsEntreCreationEtMaintenant());
+                                    out.writeUTF("Le salon " + salon_du_client + " est ouvert depuis " + salon.tempsEntreCreationEtMaintenant());
                                 }
                             }
                             break;
@@ -237,50 +223,38 @@ public class ClientHandler extends Thread {
                             out.writeUTF("Il y a " + clients.size() + " personnes connectées sur le serveur");
                             break;
 
+                        
                         // case "/followers":
-                        // // donne le nombre de follow de l'utilisateur
-                        // // out.writeUTF("Vous avez " + this.client.getFollowers().size()+ "
-                        // followers");
-                        // System.out.println(this.followers.containsKey(this.client.getNameClient()) +
-                        // " " + this.client.getNameClient() + " " + this.followers);
-                        // if (this.followers.containsKey(this.client.getNameClient())){
-                        // out.writeUTF("Vous avez " + this.followers.get(this.client.getNameClient())+
-                        // " followers");
-                        // }
-                        // else{
-                        // out.writeUTF("Vous n'avez pas de followers");
-                        // }
+                        //     // donne le nombre de follow de l'utilisateur
+                        //     // out.writeUTF("Vous avez " + this.client.getFollowers().size()+ " followers");   
+                        //     System.out.println(this.followers.containsKey(this.client.getNameClient()) + " " + this.client.getNameClient() + " " + this.followers); 
+                        //     if (this.followers.containsKey(this.client.getNameClient())){                      
+                        //         out.writeUTF("Vous avez " +  this.followers.get(this.client.getNameClient())+ " followers");
+                        //     }
+                        //     else{
+                        //         out.writeUTF("Vous n'avez pas de followers");
+                        //     }
 
-                        // break;
+
+                        //     break;
 
                         case BibliothequeString.COMMANDE_HELP:
                             out.writeUTF(BibliothequeString.COMMANDE_LIST);
-                            out.writeUTF(BibliothequeStyle.ANSI_RED + BibliothequeStyle.SOULIGNAGE
-                                    + BibliothequeString.COMMANDE_QUIT + BibliothequeStyle.ANSI_RESET
-                                    + BibliothequeString.COMMANDE_QUIT_INFO);
-                            out.writeUTF(BibliothequeStyle.ANSI_RED + BibliothequeStyle.SOULIGNAGE
-                                    + BibliothequeString.COMMANDE_UPTIME + BibliothequeStyle.ANSI_RESET
-                                    + BibliothequeString.COMMANDE_UPTIME_INFO);
-                            out.writeUTF(BibliothequeStyle.ANSI_RED + BibliothequeStyle.SOULIGNAGE
-                                    + BibliothequeString.COMMANDE_USER + BibliothequeStyle.ANSI_RESET
-                                    + BibliothequeString.COMMANDE_USER_INFO);
-                            out.writeUTF(BibliothequeStyle.ANSI_RED + BibliothequeStyle.SOULIGNAGE
-                                    + BibliothequeString.COMMANDE_MP + BibliothequeStyle.ANSI_RESET
-                                    + BibliothequeString.COMMANDE_MP_INFO);
+                            out.writeUTF(BibliothequeStyle.ANSI_RED + BibliothequeStyle.SOULIGNAGE + BibliothequeString.COMMANDE_QUIT + BibliothequeStyle.ANSI_RESET + BibliothequeString.COMMANDE_QUIT_INFO);
+                            out.writeUTF(BibliothequeStyle.ANSI_RED + BibliothequeStyle.SOULIGNAGE + BibliothequeString.COMMANDE_UPTIME + BibliothequeStyle.ANSI_RESET + BibliothequeString.COMMANDE_UPTIME_INFO);
+                            out.writeUTF(BibliothequeStyle.ANSI_RED + BibliothequeStyle.SOULIGNAGE + BibliothequeString.COMMANDE_USER + BibliothequeStyle.ANSI_RESET + BibliothequeString.COMMANDE_USER_INFO);
+                            out.writeUTF(BibliothequeStyle.ANSI_RED + BibliothequeStyle.SOULIGNAGE + BibliothequeString.COMMANDE_MP + BibliothequeStyle.ANSI_RESET + BibliothequeString.COMMANDE_MP_INFO);
 
-                            break;
+                            break;   
 
                         default:
-                            out.writeUTF(BibliothequeString.COMMANDE_INCONNU + BibliothequeStyle.ANSI_RED
-                                    + BibliothequeStyle.SOULIGNAGE + BibliothequeString.COMMANDE_HELP
-                                    + BibliothequeStyle.ANSI_RESET);
+                            out.writeUTF(BibliothequeString.COMMANDE_INCONNU +BibliothequeStyle.ANSI_RED + BibliothequeStyle.SOULIGNAGE + BibliothequeString.COMMANDE_HELP + BibliothequeStyle.ANSI_RESET);
                             break;
                     }
-                }
+                } 
             }
         } catch (IOException e) {
             System.out.println(BibliothequeString.NOTIFICATION_DECONNEXION);
-            System.out.println("jdbqljksdhlkqsdlkqsbnd");
             for (Client client : clients) {
                 Socket keySocket = client.getSocket();
                 if (keySocket == this.client.getSocket()) {
