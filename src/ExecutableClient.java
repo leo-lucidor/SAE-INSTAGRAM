@@ -20,11 +20,10 @@ public class ExecutableClient {
                     }
                 }
             } catch (Exception e) {
-                System.out.println("\u001b[31;1mDéconnexion forcé du serveur, fermeture du client" + BibliothequeStyle.ANSI_RESET);
+                System.out.println("\u001b[31;1mDéconnexion forcé du serveur, fermeture du client\u001b[0m");
             }
         } catch (Exception e) {
-            e.getMessage();
-            System.out.println("\u001b[31;1mErreur lors de la connexion au serveur" + BibliothequeStyle.ANSI_RESET);
+            System.out.println("\u001b[31;1mErreur lors de la connexion au serveur\u001b[0m");
             connecte = false;
         }
     }

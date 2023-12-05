@@ -14,27 +14,27 @@ public class ExecutableServer {
         int port = sc.nextInt();
         sc.close();
 
-        try (ServerSocket serveur = new ServerSocket(port)) {
-            // On crée une liste qui va contenir les clients
-            List<Client> clients = new ArrayList<Client>();
-            System.out.println("Serveur lancé, en attente de connexion...");
+        ServerSocket serveur = new ServerSocket(port);
 
-            // On crée une liste qui va contenir les salons
-            List<Salon> salons = new ArrayList<Salon>();
+        // On crée une liste qui va contenir les clients
+        List<Client> clients = new ArrayList<Client>();
+        System.out.println("Serveur lancé, en attente de connexion...");
+
+        // On crée une liste qui va contenir les salons
+        List<Salon> salons = new ArrayList<Salon>();
 
 
-            while(true){
-                // On attend une connexion d'un client
-                Socket socket = serveur.accept();
-                System.out.println("Client connecté");
-                Client client = new Client("");
-                client.setSocket(socket);
-                clients.add(client);
+        while(true){
+            // On attend une connexion d'un client
+            Socket socket = serveur.accept();
+            System.out.println("Client connecté");
+            Client client = new Client("");
+            client.setSocket(socket);
+            clients.add(client);
 
-                // On lance un thread qui va gérer la connexion avec ce client
-                Thread t = new Thread(new ClientHandler(client, clients, salons));
-                t.start();
-            }
+            // On lance un thread qui va gérer la connexion avec ce client
+            Thread t = new Thread(new ClientHandler(client, clients, salons));
+            t.start();
         }
     }
 }
