@@ -1,3 +1,4 @@
+package ancien;
 public class Utilisateur {
     private String ip;
     private String nomUtilisateur;

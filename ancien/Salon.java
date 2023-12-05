@@ -1,3 +1,4 @@
+package ancien;
 import java.util.List;
 
 public class Salon {
