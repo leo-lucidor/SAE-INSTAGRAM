@@ -11,7 +11,6 @@ public class ClientHandler extends Thread{
     private Client client;
     private List<Client> clients;
     private List<Salon> salons;
-    private HashMap<String, Integer> followers;
 
     public ClientHandler(Client client, List<Client> clients, List<Salon> salons){
         this.client = client;
