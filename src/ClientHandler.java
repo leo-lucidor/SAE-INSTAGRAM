@@ -256,6 +256,7 @@ public class ClientHandler extends Thread{
             }
         } catch (IOException e) {
             System.out.println(BibliothequeString.NOTIFICATION_DECONNEXION);
+            System.out.println("jdbqljksdhlkqsdlkqsbnd");
             for (Client client : clients) {
                 Socket keySocket = client.getSocket();
                 if (keySocket == this.client.getSocket()) {
