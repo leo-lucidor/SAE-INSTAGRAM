@@ -3,6 +3,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Client {
@@ -66,22 +68,23 @@ public class Client {
     public void setConnexion(){
         clearTerminal();
         // On se connecte au serveur
-        System.out.println("\u001b[4mAdresse IP du serveur :\u001b[0m");
-        Scanner scanner = new Scanner(System.in);
-        String ipServeur = scanner.nextLine();
-        System.out.println("\u001b[4mPort du serveur :\u001b[0m");
-        int portServeur = scanner.nextInt();
-        scanner.nextLine();
+        System.out.println(BibliothequeStyle.ANSI_BLUE + "Adresse IP du serveur :\u001b[0m");
+        try (Scanner scanner = new Scanner(System.in)) {
+            String ipServeur = scanner.nextLine();
+            System.out.println(BibliothequeStyle.ANSI_BLUE + "Port du serveur :\u001b[0m");
+            int portServeur = scanner.nextInt();
+            scanner.nextLine();
 
-        try{
-            socket = new Socket(ipServeur, portServeur);
-            System.out.println("Client connected");
-            setSocket(socket);
-        } catch (Exception e) {
-            if (e instanceof UnknownHostException) {
-                System.out.println("Je ne trouve de serveur avec cette adresse IP.");
-            } else if (e instanceof IOException) {
-                System.out.println("Erreur de connexion.");
+            try{
+                socket = new Socket(ipServeur, portServeur);
+                System.out.println("Client connected");
+                setSocket(socket);
+            } catch (Exception e) {
+                if (e instanceof UnknownHostException) {
+                    System.out.println("Je ne trouve de serveur avec cette adresse IP.");
+                } else if (e instanceof IOException) {
+                    System.out.println("Erreur de connexion.");
+                }
             }
         }
     }
@@ -103,32 +106,32 @@ public class Client {
     public void demanderNom() throws IOException{
         
         clearTerminal();
-        Scanner scanner = new Scanner(System.in);
-        
-        // On récupère le nom du client et on vérifie si il est déjà utilisé
-        Boolean isNameSet = false;
-        String nomClient = "";
-        DataInputStream in = new DataInputStream(this.getSocket().getInputStream());
-        DataOutputStream out = new DataOutputStream(this.getSocket().getOutputStream());
-        while (!isNameSet) {
-            // On demande le nom du client
-            System.out.println("\u001b[4mNom du client :\u001b[0m");
-            nomClient = scanner.nextLine();
-            
-            // On envoie le nom au serveur
-            if (nomClient.length() > 0) {
-                out.writeUTF(nomClient);
-                String isNameUsed = in.readUTF();
-                if (isNameUsed.equals("true")) {
-                    // Si le nom est déjà utilisé, on recommence
-                    clearTerminal();
-                    System.out.println("\u001b[31;1mCe nom est déjà utilisé.\u001b[0m");
-                } else {
-                    // Sinon, on enregistre le nom du client
-                    isNameSet = true;
-                    this.setNameClient(nomClient);
-                    clearTerminal();
-                    System.out.println("\u001b[34;1mNom du client enregistré.\u001b[0m");
+        try (Scanner scanner = new Scanner(System.in)) {
+            // On récupère le nom du client et on vérifie si il est déjà utilisé
+            Boolean isNameSet = false;
+            String nomClient = "";
+            DataInputStream in = new DataInputStream(this.getSocket().getInputStream());
+            DataOutputStream out = new DataOutputStream(this.getSocket().getOutputStream());
+            while (!isNameSet) {
+                // On demande le nom du client
+                System.out.println(BibliothequeStyle.ANSI_BLUE + "Nom du client :\u001b[0m");
+                nomClient = scanner.nextLine();
+                
+                // On envoie le nom au serveur
+                if (nomClient.length() > 0) {
+                    out.writeUTF(nomClient);
+                    String isNameUsed = in.readUTF();
+                    if (isNameUsed.equals("true")) {
+                        // Si le nom est déjà utilisé, on recommence
+                        clearTerminal();
+                        System.out.println(BibliothequeStyle.ANSI_RED + "Ce nom est déjà utilisé.\u001b[0m");
+                    } else {
+                        // Sinon, on enregistre le nom du client
+                        isNameSet = true;
+                        this.setNameClient(nomClient);
+                        clearTerminal();
+                        System.out.println(BibliothequeStyle.ANSI_YELLOW + "Nom du client enregistré.\u001b[0m");
+                    }
                 }
             }
         }
