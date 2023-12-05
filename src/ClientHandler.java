@@ -12,8 +12,6 @@ public class ClientHandler extends Thread{
     private List<Client> clients;
     private List<Salon> salons;
     private HashMap<String, Integer> followers;
-    private BibliothequeCouleur bc = new BibliothequeCouleur();
-
 
     public ClientHandler(Client client, List<Client> clients, List<Salon> salons){
         this.client = client;
@@ -22,7 +20,7 @@ public class ClientHandler extends Thread{
     }
 
     public void clearTerminalClient(DataOutputStream out) throws IOException{
-        out.writeUTF("clear");
+        out.writeUTF(BibliothequeString.CLEAR);
     }
 
     public void afficherSalons(DataOutputStream out) throws IOException{
@@ -30,21 +28,21 @@ public class ClientHandler extends Thread{
 
         // On affiche les salons
         if (salons.size() > 0) {
-            out.writeUTF(bc.ANSI_CYAN + "\u001b[4mSalons disponibles :\u001b[0m");
+            out.writeUTF(BibliothequeStyle.ANSI_CYAN +BibliothequeStyle.SOULIGNAGE + "Salons disponibles :"+ BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
             for (Salon salon : salons) {
-                out.writeUTF("\u001b[32m-"+salon+"\u001b[0m");
+                out.writeUTF("\u001b[32m-"+salon+""+ BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
             }
         } else {
-            out.writeUTF(bc.ANSI_CYAN + "Il n'y a pas de salon, créez-en un !\u001b[0m");
+            out.writeUTF(BibliothequeStyle.ANSI_CYAN + "Il n'y a pas de salon, créez-en un !"+ BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
         }
-        out.writeUTF(bc.ANSI_CYAN + "(si vous faites /quit ici, vous serez déconnecté)\u001b[0m");
+        out.writeUTF(BibliothequeStyle.ANSI_CYAN + "(si vous faites /quit ici, vous serez déconnecté)"+ BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
     }
 
 
     public String verifName(DataInputStream in, DataOutputStream out) throws IOException{
         // On récupère le nom du client et on vérifie si il est déjà utilisé
         Boolean isNameSet = false;
-        String nomClient = "";
+        String nomClient = BibliothequeString.VIDE;
         while (!isNameSet) {
             nomClient = in.readUTF();
             if (nomClient.length() > 0) {
@@ -53,7 +51,7 @@ public class ClientHandler extends Thread{
                     String name = client.getNameClient();
                     if (name.equals(nomClient)) {
                         isNameUsed = true;
-                        out.writeUTF("true");
+                        out.writeUTF(BibliothequeString.TRUE);
                     }
                 }
                 if (!isNameUsed) {
@@ -63,7 +61,7 @@ public class ClientHandler extends Thread{
                         }
                     }
                     isNameSet = true;
-                    out.writeUTF("false");
+                    out.writeUTF(BibliothequeString.FALSE);
                 }
             }
         }
@@ -75,7 +73,7 @@ public class ClientHandler extends Thread{
         // si il existe, on vérifie si le client est déjà dedans
         // si il n'existe pas, on le crée
         Boolean isSalonSet = false;
-        String nomSalon = "";
+        String nomSalon = BibliothequeString.VIDE;
         afficherSalons(out);
         // tant que le salon n'est pas défini
         while (!isSalonSet) {
@@ -86,7 +84,7 @@ public class ClientHandler extends Thread{
             if (nomSalon.length() > 0) {
 
                 // si le client envoie /quit on le déconnecte
-                if (nomSalon.equals("/quit")) {
+                if (nomSalon.equals(BibliothequeString.COMMANDE_QUIT)) {
                     for (Client client : clients) {
                         if (client.getSocket() == this.client.getSocket()) {
                             client.getSocket().close();
@@ -108,7 +106,7 @@ public class ClientHandler extends Thread{
                                 }
                             }
                             isSalonSet = true;
-                            out.writeUTF("tp");
+                            out.writeUTF(BibliothequeString.TP);
                         }
                     }
                     // si le salon n'existe pas
@@ -122,7 +120,7 @@ public class ClientHandler extends Thread{
                             }
                         }
                         isSalonSet = true;
-                        out.writeUTF("new");
+                        out.writeUTF(BibliothequeString.NEW);
                     }
                 } else {
                     // si il n'y a pas de salon
@@ -135,29 +133,27 @@ public class ClientHandler extends Thread{
                         }
                     }
                     isSalonSet = true;
-                    out.writeUTF("new");
+                    out.writeUTF(BibliothequeString.NEW);
                 }
             }
         }
-        out.writeUTF(bc.ANSI_CYAN + "Vous êtes dans le salon "+nomSalon+"\u001b[0m");
+        out.writeUTF(BibliothequeStyle.ANSI_CYAN + BibliothequeString.NOTIFICATION_SALON + nomSalon+ BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
     }
 
-    public DataInputStream dataInputStream(Client client) throws IOException{
+    public DataInputStream dis(Client client) throws IOException{
         DataInputStream res = new DataInputStream(client.getSocket().getInputStream());
         return res;
     }
 
-    public DataOutputStream dataOutputStream(Client client) throws IOException{
+    public DataOutputStream dos(Client client) throws IOException{
         DataOutputStream res = new DataOutputStream(client.getSocket().getOutputStream());
         return res;
     }
-    
-    c
+
     public void run(){
         try {
-            DataInputStream in = new DataInputStream(client.getSocket().getInputStream());
-            DataOutputStream out = new DataOutputStream(client.getSocket().getOutputStream());
-            
+            DataInputStream in = dis(client);
+            DataOutputStream out = dos(client);
             // On demande le nom du client
             String nomClient = verifName(in,out);
             // On demande le nom du salon
@@ -191,23 +187,23 @@ public class ClientHandler extends Thread{
                         }
                     }else{
                         
-                        if (message.startsWith("!follow") && contientEspace) {
-                            String pseudo = message.substring(message.indexOf("!follow")+8, message.indexOf(" "));
-                            for (Client client: clients) {
-                                DataOutputStream out7  = new DataOutputStream(client.getSocket().getOutputStream());
-                                out7.writeUTF("res = " + pseudo.equals(client.getNameClient()) + " pseudo " + pseudo + " client " + client.getNameClient());
-                                if (pseudo.equals(client.getNameClient())) {
-                                    DataOutputStream out3 = new DataOutputStream(client.getSocket().getOutputStream());
-                                    out3.writeUTF("MP" + this.client.getNameClient() + " vous suit");
-                                    if (this.followers.containsKey(client.getNameClient())){
-                                        this.followers.put(client.getNameClient(), this.followers.get(client.getNameClient())+1);
-                                    }else{
-                                        this.followers.put(client.getNameClient(), 1);
-                                    }
-                                }
-                            }
-                        }
-                        else {
+                        // if (message.startsWith("!follow") && contientEspace) {
+                        //     String pseudo = message.substring(message.indexOf("!follow")+8, message.indexOf(" "));
+                        //     for (Client client: clients) {
+                        //         DataOutputStream out7  = new DataOutputStream(client.getSocket().getOutputStream());
+                        //         out7.writeUTF("res = " + pseudo.equals(client.getNameClient()) + " pseudo " + pseudo + " client " + client.getNameClient());
+                        //         if (pseudo.equals(client.getNameClient())) {
+                        //             DataOutputStream out3 = new DataOutputStream(client.getSocket().getOutputStream());
+                        //             out3.writeUTF("MP" + this.client.getNameClient() + " vous suit");
+                        //             if (this.followers.containsKey(client.getNameClient())){
+                        //                 this.followers.put(client.getNameClient(), this.followers.get(client.getNameClient())+1);
+                        //             }else{
+                        //                 this.followers.put(client.getNameClient(), 1);
+                        //             }
+                        //         }
+                        //     }
+                        // }
+                        // else {
                             // On envoie le message à tous les clients
                             for (Client client : clients) {
                                 Socket keySocket = client.getSocket();
@@ -217,17 +213,14 @@ public class ClientHandler extends Thread{
                                 }
                             }
                         }
-                    }
-
-                    
                 } else if (message.startsWith("/")) {
 
                     switch (message) {
-                        case "/quit":
+                        case BibliothequeString.COMMANDE_QUIT:
                             changerSalon(in, out);
                             break;
 
-                        case "/uptime":
+                        case BibliothequeString.COMMANDE_UPTIME:
                             // dit depuis combien de temps le salon est ouvert
                             String salon_du_client = this.client.getSalon();
                             for (Salon salon : salons) {
@@ -237,43 +230,43 @@ public class ClientHandler extends Thread{
                             }
                             break;
 
-                        case "/user":
+                        case BibliothequeString.COMMANDE_USER:
                             // donne le nombre de personne connectée sur le serveur
                             out.writeUTF("Il y a " + clients.size() + " personnes connectées sur le serveur");
                             break;
 
                         
-                        case "/followers":
-                            // donne le nombre de follow de l'utilisateur
-                            // out.writeUTF("Vous avez " + this.client.getFollowers().size()+ " followers");   
-                            System.out.println(this.followers.containsKey(this.client.getNameClient()) + " " + this.client.getNameClient() + " " + this.followers); 
-                            if (this.followers.containsKey(this.client.getNameClient())){                      
-                                out.writeUTF("Vous avez " +  this.followers.get(this.client.getNameClient())+ " followers");
-                            }
-                            else{
-                                out.writeUTF("Vous n'avez pas de followers");
-                            }
+                        // case "/followers":
+                        //     // donne le nombre de follow de l'utilisateur
+                        //     // out.writeUTF("Vous avez " + this.client.getFollowers().size()+ " followers");   
+                        //     System.out.println(this.followers.containsKey(this.client.getNameClient()) + " " + this.client.getNameClient() + " " + this.followers); 
+                        //     if (this.followers.containsKey(this.client.getNameClient())){                      
+                        //         out.writeUTF("Vous avez " +  this.followers.get(this.client.getNameClient())+ " followers");
+                        //     }
+                        //     else{
+                        //         out.writeUTF("Vous n'avez pas de followers");
+                        //     }
 
 
-                            break;
+                        //     break;
 
-                        case "/help":
-                            out.writeUTF("Liste des commandes :");
-                            out.writeUTF(bc.ANSI_RED +  "\u001b[4m/quit\u001b[0m : permet de changer de salon");
-                            out.writeUTF(bc.ANSI_RED +  "\u001b[4m/uptime\u001b[0m : dit depuis combien de temps le salon est ouvert");
-                            out.writeUTF(bc.ANSI_RED +  "\u001b[4m/user\u001b[0m : donne le nombre de personne connectée sur le serveur");
-                            out.writeUTF(bc.ANSI_RED +  "\u001b[4m@<nom>\u001b[0m : permet d'envoyer un message privé à un utilisateur");
+                        case BibliothequeString.COMMANDE_HELP:
+                            out.writeUTF(BibliothequeString.COMMANDE_LIST);
+                            out.writeUTF(BibliothequeStyle.ANSI_RED + BibliothequeStyle.SOULIGNAGE + BibliothequeString.COMMANDE_QUIT + BibliothequeStyle.ANSI_RESET + BibliothequeString.COMMANDE_QUIT_INFO);
+                            out.writeUTF(BibliothequeStyle.ANSI_RED + BibliothequeStyle.SOULIGNAGE + BibliothequeString.COMMANDE_UPTIME + BibliothequeStyle.ANSI_RESET + BibliothequeString.COMMANDE_UPTIME_INFO);
+                            out.writeUTF(BibliothequeStyle.ANSI_RED + BibliothequeStyle.SOULIGNAGE + BibliothequeString.COMMANDE_USER + BibliothequeStyle.ANSI_RESET + BibliothequeString.COMMANDE_USER_INFO);
+                            out.writeUTF(BibliothequeStyle.ANSI_RED + BibliothequeStyle.SOULIGNAGE + BibliothequeString.COMMANDE_MP + BibliothequeStyle.ANSI_RESET + BibliothequeString.COMMANDE_MP_INFO);
 
                             break;   
 
                         default:
-                            out.writeUTF("Commande inconnue pour plus d'information écriver:" +bc.ANSI_RED +  "\u001b[4m/help\u001b[0m");
+                            out.writeUTF(BibliothequeString.COMMANDE_INCONNU +BibliothequeStyle.ANSI_RED + BibliothequeStyle.SOULIGNAGE + BibliothequeString.COMMANDE_HELP + BibliothequeStyle.ANSI_RESET);
                             break;
                     }
                 } 
             }
         } catch (IOException e) {
-            System.out.println("Un client vient de se déconnecter.");
+            System.out.println(BibliothequeString.NOTIFICATION_DECONNEXION);
             for (Client client : clients) {
                 Socket keySocket = client.getSocket();
                 if (keySocket == this.client.getSocket()) {
@@ -282,7 +275,7 @@ public class ClientHandler extends Thread{
                 }
             }
         } catch (Exception e) {
-            System.out.println("Erreur dans le thread client");
+            System.out.println(BibliothequeString.NOTIFICATION_ERREUR_THREAD);
         }
     }
 }

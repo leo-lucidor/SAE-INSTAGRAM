@@ -1,6 +1,6 @@
-public class BibliothequeCouleur {
+public class BibliothequeStyle {
     
-    public BibliothequeCouleur() {
+    private BibliothequeStyle() {
     }
 
     public static final String ANSI_RESET = "\u001B[0m";
@@ -12,4 +12,7 @@ public class BibliothequeCouleur {
     public static final String ANSI_PURPLE = "\u001B[35m";
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
+
+    public static final String SOULIGNAGE = "\u001b[4m";
 }
+

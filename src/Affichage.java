@@ -8,7 +8,6 @@ import java.util.List;
 
 public class Affichage implements Runnable {
     private DataInputStream in;
-    private BibliothequeCouleur bc = new BibliothequeCouleur();
 
     public Affichage(DataInputStream in){
         this.in = in;
@@ -24,7 +23,7 @@ public class Affichage implements Runnable {
                 String message = in.readUTF();
                 if (!motPasAfficher.contains(message)) {
                     if (message.startsWith("MP") &&  message.contains("vous chuchotte : ")) {
-                        String private_message = "\u001b[1m\u001b[33m" + message.substring(message.indexOf("P")+1) + "\u001b[0m";
+                        String private_message = "\u001b[1m\u001b[33m" + message.substring(message.indexOf("P")+1) + "" + BibliothequeStyle.ANSI_RESET;
                         System.out.println(private_message);
                     }else{
                         System.out.println(message);
@@ -33,13 +32,13 @@ public class Affichage implements Runnable {
 
                     switch (message) {
                         case "insalon":
-                            System.out.println(bc.ANSI_PURPLE + "Vous êtes déjà dans ce salon\u001b[0m");
+                            System.out.println(BibliothequeStyle.ANSI_PURPLE + "Vous êtes déjà dans ce salon" + BibliothequeStyle.ANSI_RESET);
                             break;
                         case "tp":
-                            System.out.println(bc.ANSI_PURPLE + "Vous avez été téléporté dans le salon\u001b[0m");
+                            System.out.println(BibliothequeStyle.ANSI_PURPLE + "Vous avez été téléporté dans le salon" + BibliothequeStyle.ANSI_RESET);
                             break;
                         case "new":
-                            System.out.println(bc.ANSI_PURPLE + "Le salon a été créé\u001b[0m");
+                            System.out.println(BibliothequeStyle.ANSI_PURPLE + "Le salon a été créé" + BibliothequeStyle.ANSI_RESET);
                             break;
                         case "clear":
                             Client.clearTerminal();
@@ -50,10 +49,10 @@ public class Affichage implements Runnable {
                     }
             } catch (Exception e) {
                 if (e instanceof EOFException || e instanceof SocketException) {
-                    System.out.println(bc.ANSI_RED + "Le serveur a fermé la connexion ou vous avez été déconnecté\u001b[0m");
+                    System.out.println(BibliothequeStyle.ANSI_RED + "Le serveur a fermé la connexion ou vous avez été déconnecté" + BibliothequeStyle.ANSI_RESET);
                     System.exit(0);
                 } else if (e instanceof IOException) {
-                    System.out.println(bc.ANSI_RED + "Erreur d'entrée/sortie\u001b[0m");
+                    System.out.println(BibliothequeStyle.ANSI_RED + "Erreur d'entrée/sortie" + BibliothequeStyle.ANSI_RESET);
                     System.exit(0);
                 }
             }
