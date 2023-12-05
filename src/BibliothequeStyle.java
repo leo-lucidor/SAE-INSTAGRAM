@@ -1,6 +1,6 @@
 public class BibliothequeStyle {
     
-    private BibliothequeStyle() {
+    public BibliothequeStyle() {
     }
 
     public static final String ANSI_RESET = "\u001B[0m";
