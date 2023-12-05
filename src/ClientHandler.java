@@ -141,7 +141,18 @@ public class ClientHandler extends Thread{
         }
         out.writeUTF(bc.ANSI_CYAN + "Vous êtes dans le salon "+nomSalon+"\u001b[0m");
     }
+
+    public DataInputStream dataInputStream(Client client) throws IOException{
+        DataInputStream res = new DataInputStream(client.getSocket().getInputStream());
+        return res;
+    }
+
+    public DataOutputStream dataOutputStream(Client client) throws IOException{
+        DataOutputStream res = new DataOutputStream(client.getSocket().getOutputStream());
+        return res;
+    }
     
+    c
     public void run(){
         try {
             DataInputStream in = new DataInputStream(client.getSocket().getInputStream());

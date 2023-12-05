@@ -30,16 +30,24 @@ public class Affichage implements Runnable {
                         System.out.println(message);
                     }
                 }else{
-                    if (message.equals("insalon")) {
-                        System.out.println(bc.ANSI_PURPLE + "Vous êtes déjà dans ce salon\u001b[0m");
-                    } else if (message.equals("tp")) {
-                        System.out.println(bc.ANSI_PURPLE + "Vous avez été téléporté dans le salon\u001b[0m");
-                    } else if (message.equals("new")) {
-                        System.out.println(bc.ANSI_PURPLE + "Le salon a été créé\u001b[0m");
-                    } else if (message.equals("clear")) {
-                        Client.clearTerminal();
+
+                    switch (message) {
+                        case "insalon":
+                            System.out.println(bc.ANSI_PURPLE + "Vous êtes déjà dans ce salon\u001b[0m");
+                            break;
+                        case "tp":
+                            System.out.println(bc.ANSI_PURPLE + "Vous avez été téléporté dans le salon\u001b[0m");
+                            break;
+                        case "new":
+                            System.out.println(bc.ANSI_PURPLE + "Le salon a été créé\u001b[0m");
+                            break;
+                        case "clear":
+                            Client.clearTerminal();
+                            break;
+                        default:
+                            break;
+                        }
                     }
-                }
             } catch (Exception e) {
                 if (e instanceof EOFException || e instanceof SocketException) {
                     System.out.println(bc.ANSI_RED + "Le serveur a fermé la connexion ou vous avez été déconnecté\u001b[0m");
