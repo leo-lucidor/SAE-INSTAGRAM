@@ -1,0 +1,12 @@
+{
+    "connexion" : [
+        {
+            "id" : "1",
+            "nom" : "admin"
+        },
+        {
+            "id" : "2",
+            "nom" : "user"
+        }
+    ]
+}

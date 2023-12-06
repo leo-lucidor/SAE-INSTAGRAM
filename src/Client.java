@@ -15,7 +15,7 @@ public class Client {
         this.nameClient = nameClient;
         this.salon = "";
     }
-
+    
     public Socket getSocket() {
         return socket;
     }

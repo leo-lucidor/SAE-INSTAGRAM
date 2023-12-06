@@ -18,3 +18,6 @@ Notre SAE vous permet de discuter sur une application client-serveur de messager
 4. Saisir le port (1234 si ça n'a pas été changé)
 5. Saisir un pseudo pour vous identifier auprès des autres utilisateurs
 6. Créer ou rejoindre des groupes de discussion pour échanger des messages.
+
+
+javac -cp ..\jar\json-20230618.jar *.java
