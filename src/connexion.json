@@ -1,5 +1,17 @@
-[{
-    "idUtilisateur": 1,
-    "motsDePasse": "erwan",
-    "pseudo": "erwan"
-}]
+{"connexion":[
+    {
+        "idUtilisateur": 1,
+        "data": {
+            "nom": "test1",
+            "id" : 1
+        }
+    },
+    {
+        "idUtilisateur": 2,
+        "data" : {
+            "nom": "test2",
+            "id": 2
+        }
+
+    }
+]}

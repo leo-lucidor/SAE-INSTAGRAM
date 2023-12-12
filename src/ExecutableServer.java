@@ -67,7 +67,7 @@ public class ExecutableServer {
 
 
                 System.out.println("Client connecté");
-                Client client = new Client("");
+                Client client = new Client("", getLastIdInJson("connexion.json")+1);
                 client.setSocket(socket);
 
 
