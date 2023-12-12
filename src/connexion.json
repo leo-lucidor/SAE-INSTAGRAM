@@ -1,12 +1,5 @@
-{
-    "connexion" : [
-        {
-            "id" : "1",
-            "nom" : "admin"
-        },
-        {
-            "id" : "2",
-            "nom" : "user"
-        }
-    ]
-}
+[{
+    "idUtilisateur": 1,
+    "motsDePasse": "erwan",
+    "pseudo": "erwan"
+}]

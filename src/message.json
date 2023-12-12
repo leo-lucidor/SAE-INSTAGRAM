@@ -1,3 +1,9 @@
-{
-    "message" : []
-}
+[{
+    "data": [{
+        "contenu": "Veuillez entrer votre pseudo :",
+        "date": "2023/12/12",
+        "heure": "23:31:03",
+        "idMessage": 1
+    }],
+    "idUtilisateur": 1
+}]
