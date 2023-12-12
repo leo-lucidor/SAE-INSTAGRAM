@@ -9,15 +9,21 @@ public class Client {
     private Socket socket;
     private String nameClient;
     private String salon;
+    private int id;
 
-    public Client(String nameClient){
+    public Client(String nameClient, int id){
         this.socket = null;
         this.nameClient = nameClient;
         this.salon = "";
+        this.id = id;
     }
     
     public Socket getSocket() {
         return socket;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public void setSocket(Socket socket) {

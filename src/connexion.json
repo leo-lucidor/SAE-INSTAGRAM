@@ -1,12 +1,17 @@
-{
-    "connexion" : [
-        {
-            "id" : "1",
-            "nom" : "admin"
-        },
-        {
-            "id" : "2",
-            "nom" : "user"
+{"connexion":[
+    {
+        "idUtilisateur": 1,
+        "data": {
+            "nom": "test1",
+            "id" : 1
         }
-    ]
-}
+    },
+    {
+        "idUtilisateur": 2,
+        "data" : {
+            "nom": "test2",
+            "id": 2
+        }
+
+    }
+]}

@@ -5,11 +5,16 @@ import java.net.Socket;
 import java.util.List;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
+import org.json.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.FileWriter;
 
 public class ClientHandler implements Runnable {
     private Client client;
     private List<Client> clients;
     private List<Salon> salons;
+    private String FICHIER_JSON = "message.json";
 
     public ClientHandler(Client client, List<Client> clients, List<Salon> salons) {
         this.client = client;
@@ -19,6 +24,67 @@ public class ClientHandler implements Runnable {
 
     public void clearTerminalClient(DataOutputStream out) throws IOException {
         out.writeUTF(BibliothequeString.CLEAR);
+    }
+
+    public int getIdUtilisateurWithNomInJson(String nom){
+        int id = 0;
+        try{
+            // Lecture du contenu du fichier JSON dans une chaîne
+            String contenuFichier = new String(Files.readAllBytes(Paths.get("connexion.json")));
+
+            // Création d'un objet JSON à partir de la chaîne lue
+            JSONObject jsonObject = new JSONObject(contenuFichier);
+
+            // Récupération du tableau "connexion"
+            JSONArray connexionArray = jsonObject.getJSONArray("connexion");
+
+            // Parcours des éléments du tableau "connexion"
+            for (int i = 0; i < connexionArray.length(); i++) {
+                JSONObject obj = connexionArray.getJSONObject(i);
+                // on parcours le data de chaque objet
+                JSONObject dataObj = obj.getJSONObject("data");
+                if (dataObj.getString("nom").equals(nom)){
+                    id = dataObj.getInt("id");
+                }
+            }
+        }
+        catch(Exception e){
+            System.out.println("Erreur lors de la lecture du fichier JSON : " + e.getMessage());
+        }
+        return id;
+    }
+
+    public void enregistrerMessage(int idMessage, String user, String content,LocalDateTime date ) throws JSONException {
+        // Créer un objet JSON représentant le message
+        JSONObject data = new JSONObject();
+       
+        JSONObject id = new JSONObject();
+        JSONObject message = new JSONObject();
+        message.put("idMessage", idMessage);
+        message.put("user", user);
+        message.put("content", content);
+        message.put("date", date);
+        int idUtilisateur = getIdUtilisateurWithNomInJson(user);
+        id.put("idUtilisateur", idUtilisateur);
+        id.put("data", message);
+        
+    
+        // Charger les messages existants depuis le fichier JSON
+        JSONArray messagesExistants = new JSONArray();
+        try {
+            String contenuFichier = new String(Files.readAllBytes(Paths.get(this.FICHIER_JSON)));
+            messagesExistants = new JSONArray(contenuFichier);
+        } catch (IOException e) {
+            // Le fichier n'existe probablement pas encore, c'est acceptable.
+        }
+    
+    
+        // Enregistrer la liste mise à jour dans le fichier JSON
+        try (FileWriter fichierJson = new FileWriter(this.FICHIER_JSON)) {
+            fichierJson.write(messagesExistants.toString(4)); // Indentation de 4 espaces pour la lisibilité
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void afficherSalons(DataOutputStream out) throws IOException {
@@ -95,6 +161,7 @@ public class ClientHandler implements Runnable {
             // On demande le nom du salon
             mettreClientDansGlobal(out);
 
+
             while (true) {
                 // DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd HH:mm");
@@ -104,7 +171,10 @@ public class ClientHandler implements Runnable {
                 if (!message.startsWith("/")) {
                     String msg_a_envoyer = dtf.format(now) + " [" + this.client.getSalon() + "] " + nomClient + " - "
                             + message;
-                    System.out.println(msg_a_envoyer);
+
+                    // On enregistre le message dans le fichier JSON
+                    System.out.println( "id : " + this.client.getId() + " user : " + nomClient + " content : " + message + " date : " + dtf.format(now));
+                    enregistrerMessage( this.client.getId(), client.getNameClient(), message, now);
 
                     // message privé -> on envoie le message uniquement au client mentionné
                     boolean contientEspace = false;
