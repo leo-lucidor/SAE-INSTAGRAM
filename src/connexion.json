@@ -1,17 +1,22 @@
-{"connexion":[
+[
     {
         "idUtilisateur": 1,
-        "data": {
-            "nom": "test1",
-            "id" : 1
-        }
+        "motsDePasse": "5",
+        "pseudo": "erwann"
     },
     {
         "idUtilisateur": 2,
-        "data" : {
-            "nom": "test2",
-            "id": 2
-        }
-
+        "motsDePasse": "5",
+        "pseudo": "erwann"
+    },
+    {
+        "idUtilisateur": 3,
+        "motsDePasse": "9",
+        "pseudo": "erwann"
+    },
+    {
+        "idUtilisateur": 4,
+        "motsDePasse": "t",
+        "pseudo": "t"
     }
-]}
+]

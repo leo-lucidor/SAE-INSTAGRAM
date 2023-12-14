@@ -16,13 +16,12 @@ public class Client {
     private Socket socket;
     private String nameClient;
     private String salon;
-    private int id;
+    private String motsDePasse;
 
-    public Client(String nameClient, int id){
+    public Client(String nameClient) {
         this.socket = null;
         this.nameClient = nameClient;
         this.salon = "";
-        this.id = id;
     }
 
     public void setMotsDePasse(String motsDePasse) {
@@ -35,10 +34,6 @@ public class Client {
 
     public Socket getSocket() {
         return socket;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public void setSocket(Socket socket) {
@@ -227,18 +222,18 @@ public class Client {
                 }
 
                 if (isNameUsed) {
+                    // Si le nom est déjà utilisé, on recommence
                     clearTerminal();
                     System.out.println("\u001b[31;1mCe nom est déjà utilisé.\u001b[0m");
-                    System.out.println(BibliothequeString.DEMANDE_CONNEXION);
-                    String reponse = scanner.nextLine();
+                    out.writeUTF(BibliothequeString.DEMANDE_CONNEXION);
+                    String reponse = in.readUTF();
                     switch (reponse) {
                         case BibliothequeString.YES:
-                            boolean isMDPCorrect = false ;
                             // On demande le mots de passe du client
-                            System.out.println(BibliothequeString.DEMANDE_MDP);
-                            String mdp = scanner.nextLine();
+                            out.writeUTF(BibliothequeString.DEMANDE_MDP);
+                            String mdp = in.readUTF();
                             try {
-                                isMDPCorrect = verifPseudoInJson(nomClient);
+                                boolean isMDPCorrect = verifPseudoInJson(nomClient);
                             } catch (Exception e) {
                                 System.out.println("Erreur lors de la vérification du nom.");
                             }
@@ -249,6 +244,10 @@ public class Client {
 
                                 // On enregistre le nom du client dans le fichier JSON
                                 clearTerminal();
+
+                                ajouterUtilisateur();
+
+                                System.out.println("\u001b[34;1mNom du client enregistré.\u001b[0m");
                             } else {
                                 clearTerminal();
                                 System.out.println("\u001b[31;1mMots de passe incorrect.\u001b[0m");                                                              
