@@ -46,6 +46,7 @@ public class ExecutableServer {
         // demande le port
         Scanner sc = new Scanner(System.in);
         System.out.println("Entrez le port : ");
+        
         int port = sc.nextInt();
         sc.close();
 

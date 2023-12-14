@@ -73,8 +73,12 @@ public class Client {
         clearTerminal();
         // On se connecte au serveur
         System.out.println("\u001b[4mAdresse IP du serveur :\u001b[0m");
-        Scanner scanner = new Scanner(System.in);
-        String ipServeur = scanner.nextLine();
+
+        // Scanner scanner = new Scanner(System.in);
+        // String ipServeur = scanner.nextLine();
+        String ipServeur = "localhost";
+
+
         System.out.println("\u001b[4mPort du serveur :\u001b[0m");
         int portServeur = scanner.nextInt();
         scanner.nextLine();

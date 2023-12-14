@@ -21,3 +21,6 @@ Notre SAE vous permet de discuter sur une application client-serveur de messager
 
 
 javac -cp ..\jar\json-20230618.jar *.java
+
+
+setConnexion -- changer ici
