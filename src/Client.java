@@ -17,11 +17,21 @@ public class Client {
     private String nameClient;
     private String salon;
     private String motsDePasse;
+    private boolean estConnecte;
 
     public Client(String nameClient) {
         this.socket = null;
         this.nameClient = nameClient;
         this.salon = "";
+        this.estConnecte = false;
+    }
+
+    public void setEstConnecte(boolean bool){
+        this.estConnecte = bool;
+    }
+
+    public boolean getEstConnecte(){
+        return this.estConnecte;
     }
 
     public void setMotsDePasse(String motsDePasse) {
@@ -83,8 +93,7 @@ public class Client {
         clearTerminal();
         // On se connecte au serveur
         System.out.println("\u001b[4mAdresse IP du serveur :\u001b[0m");
-
-        // Scanner scanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
         // String ipServeur = scanner.nextLine();
         String ipServeur = "localhost";
 
@@ -233,27 +242,28 @@ public class Client {
                     String reponse = in.readUTF();
                     switch (reponse) {
                         case BibliothequeString.YES:
+                            boolean isMDPCorrect = false ;
                             // On demande le mots de passe du client
                             out.writeUTF(BibliothequeString.DEMANDE_MDP);
                             String mdp = in.readUTF();
                             try {
-                                boolean isMDPCorrect = verifPseudoInJson(nomClient);
+                                isMDPCorrect = verifPseudoInJson(nomClient);
                             } catch (Exception e) {
                                 System.out.println("Erreur lors de la vérification du nom.");
                             }
                             if (isMDPCorrect) {
                                 // On enregistre le nom du client
                                 isNameSet = true;
+                                this.setEstConnecte(true);
                                 this.setNameClient(nomClient);
+                                System.out.println(getEstConnecte());
 
-                                // On enregistre le nom du client dans le fichier JSON
-                                clearTerminal();
+                                // clearTerminal();
 
-                                ajouterUtilisateur();
 
                                 System.out.println("\u001b[34;1mNom du client enregistré.\u001b[0m");
                             } else {
-                                clearTerminal();
+                                // clearTerminal();
                                 System.out.println("\u001b[31;1mMots de passe incorrect.\u001b[0m");                                                              
 
                             }
@@ -270,9 +280,11 @@ public class Client {
                     // Sinon, on enregistre le nom du client
                     isNameSet = true;
                     this.setNameClient(nomClient);
+                    setEstConnecte(true);
+                    System.out.println(getEstConnecte());
 
                     // On enregistre le nom du client dans le fichier JSON
-                    clearTerminal();
+                    // clearTerminal();
 
                     ajouterUtilisateur();
 

@@ -346,6 +346,7 @@ public class ClientHandler implements Runnable {
                     }
                 }
                 out.writeUTF(BibliothequeString.TP);
+                out.writeUTF();
             }
         }
     }
@@ -362,8 +363,9 @@ public class ClientHandler implements Runnable {
             String nomClient = verifName(in, out);
             // On demande le nom du salon
             mettreClientDansGlobal(out);
-
+            
             while (true) {
+
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
                 LocalDateTime now = LocalDateTime.now();
                 // mettre now en MM/dd HH:mm
