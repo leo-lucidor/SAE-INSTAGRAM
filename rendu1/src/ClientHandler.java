@@ -77,7 +77,7 @@ public class ClientHandler implements Runnable {
                         client.setSalon("Global");
                     }
                 }
-                out.writeUTF(BibliothequeString.TP);
+                System.out.print(BibliothequeStyle.ANSI_GREEN +  BibliothequeString.TP + BibliothequeStyle.ANSI_RESET);
             }
         }
     }
@@ -114,12 +114,6 @@ public class ClientHandler implements Runnable {
                                 + " - " + message;
                         System.out.println(
                                 " user : " + nomClient + " content : " + message + " date : " + dtf.format(now));
-
-                        for (int i = 0; i < message.length(); i++) {
-                            if (message.charAt(i) == ' ') {
-                                contientEspace = true;
-                            }
-                        }
 
                         for (Client client : clients) {
                             Socket keySocket = client.getSocket();
