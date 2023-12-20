@@ -22,13 +22,7 @@ public class Affichage implements Runnable {
                 // On lit le message envoyé par le serveur
                 String message = in.readUTF();
                 if (!motPasAfficher.contains(message)) {
-                    if (message.startsWith("MP") && message.contains("vous chuchotte : ")) {
-                        String private_message = "\u001b[1m\u001b[33m" + message.substring(message.indexOf("P") + 1)
-                                + "" + BibliothequeStyle.ANSI_RESET;
-                        System.out.println(private_message);
-                    } else {
-                        System.out.println(message);
-                    }
+                    System.out.println(message);
                 } else {
 
                     switch (message) {
