@@ -2,22 +2,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Scanner;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 
 public class ExecutableClient {
-
-    
-    
-    
-    
-
-    
-
-
     public static void main(String[] args) throws IOException {
         Scanner sc = new Scanner(System.in);
         Client client1 = new Client("");
@@ -34,10 +20,10 @@ public class ExecutableClient {
                     }
                 }
             } catch (Exception e) {
-                System.out.println("\u001b[31;1mDéconnexion forcé du serveur, fermeture du client" + BibliothequeStyle.ANSI_RESET);
+                System.out.println("\u001b[31;1mDéconnexion forcé du serveur, fermeture du client\u001b[0m");
             }
         } catch (Exception e) {
-            System.out.println("\u001b[31;1mErreur lors de la connexion au serveur" + BibliothequeStyle.ANSI_RESET);
+            System.out.println("\u001b[31;1mErreur lors de la connexion au serveur\u001b[0m");
             connecte = false;
         }
     }

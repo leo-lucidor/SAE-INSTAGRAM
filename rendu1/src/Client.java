@@ -1,35 +1,19 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Scanner;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class Client {
     private Socket socket;
     private String nameClient;
     private String salon;
-    private String motsDePasse;
 
-    public Client(String nameClient) {
+    public Client(String nameClient){
         this.socket = null;
         this.nameClient = nameClient;
         this.salon = "";
-    }
-
-    public void setMotsDePasse(String motsDePasse) {
-        this.motsDePasse = motsDePasse;
-    }
-
-    public String getMotsDePasse() {
-        return motsDePasse;
     }
 
     public Socket getSocket() {
@@ -56,11 +40,11 @@ public class Client {
         this.salon = salon;
     }
 
-    public void closeClient() {
-        try {
+    public void closeClient(){
+        try{
             socket.close();
             System.out.println("Client disconnected");
-        } catch (Exception e) {
+        }catch(Exception e){
             System.out.println("Error closing client");
         }
     }
@@ -79,7 +63,7 @@ public class Client {
         }
     }
 
-    public void setConnexion() {
+    public void setConnexion(){
         clearTerminal();
         // On se connecte au serveur
         System.out.println("\u001b[4mAdresse IP du serveur :\u001b[0m");
@@ -89,7 +73,7 @@ public class Client {
         int portServeur = scanner.nextInt();
         scanner.nextLine();
 
-        try {
+        try{
             socket = new Socket(ipServeur, portServeur);
             System.out.println("Client connected");
             setSocket(socket);
@@ -102,7 +86,7 @@ public class Client {
         }
     }
 
-    public void startClient() throws IOException {
+    public void startClient() throws IOException{
         clearTerminal();
         // On se connecte au serveur
         setConnexion();
@@ -110,97 +94,17 @@ public class Client {
         miseEnEcoute(new DataInputStream(this.getSocket().getInputStream()));
     }
 
-    public void miseEnEcoute(DataInputStream in) {
+    public void miseEnEcoute(DataInputStream in){
         // On lance un thread qui va écouter les messages du serveur
         Thread t = new Thread(new Affichage(in));
         t.start();
     }
 
-    private int obtenirDernierIdUtilisateur(JSONArray utilisateursExistants) throws JSONException {
-        int dernierId = -1;
-
-        for (int i = 0; i < utilisateursExistants.length(); i++) {
-            JSONObject utilisateur = utilisateursExistants.getJSONObject(i);
-            int id = utilisateur.getInt("idUtilisateur");
-            if (id > dernierId) {
-                dernierId = id;
-            }
-        }
-
-        return dernierId;
-    }
-
-    public int obtenirNouvelIdUtilisateur(JSONArray utilisateursExistants) throws JSONException {
-        int dernierId = obtenirDernierIdUtilisateur(utilisateursExistants);
-
-        // Si aucun utilisateur existant, retourner 1 comme premier ID, sinon retourner
-        // le prochain ID
-        return (dernierId == -1) ? 1 : dernierId + 1;
-    }
-
-    public boolean verifPseudoInJson(String pseudo) throws JSONException {
-        String FICHIER_JSON = "connexion.json";
-        JSONArray utilisateursExistants = new JSONArray();
-        try {
-            String contenuFichier = new String(Files.readAllBytes(Paths.get(FICHIER_JSON)));
-            utilisateursExistants = new JSONArray(contenuFichier);
-        } catch (IOException e) {
-            // Le fichier n'existe probablement pas encore, c'est acceptable.
-        }
-        for (int i = 0; i < utilisateursExistants.length(); i++) {
-            JSONObject utilisateur = utilisateursExistants.getJSONObject(i);
-            String pseudoJson = utilisateur.getString("pseudo");
-            if (pseudoJson.equals(pseudo)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-
-    public void ajouterUtilisateur() {
-        String FICHIER_JSON = "connexion.json";
-
-        try {
-            demanderMotsdePasses();
-        } catch (Exception e) {
-            System.out.println("Erreur lors de la saisie du mots de passe.");
-        }
-        try {
-            // Charger les utilisateurs existants depuis le fichier JSON
-            JSONArray utilisateursExistants = new JSONArray();
-            try {
-                String contenuFichier = new String(Files.readAllBytes(Paths.get(FICHIER_JSON)));
-                utilisateursExistants = new JSONArray(contenuFichier);
-            } catch (IOException e) {
-                // Le fichier n'existe probablement pas encore, c'est acceptable.
-            }
-            String pseudo = this.nameClient;
-            String mDP = this.motsDePasse;
-            // L'ID n'existe pas encore, créer une nouvelle entrée pour l'utilisateur
-            JSONObject utilisateur = new JSONObject();
-            utilisateur.put("idUtilisateur", obtenirNouvelIdUtilisateur(utilisateursExistants));
-            utilisateur.put("pseudo", pseudo);
-            utilisateur.put("motsDePasse", mDP);
-            utilisateursExistants.put(utilisateur);
-
-            // Enregistrer la liste mise à jour dans le fichier JSON
-            try (FileWriter fichierJson = new FileWriter(FICHIER_JSON)) {
-                fichierJson.write(utilisateursExistants.toString(4)); // Indentation de 4 espaces pour la lisibilité
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void demanderNom() throws IOException {
-
+    public void demanderNom() throws IOException{
+        
         clearTerminal();
         Scanner scanner = new Scanner(System.in);
-
+        
         // On récupère le nom du client et on vérifie si il est déjà utilisé
         Boolean isNameSet = false;
         String nomClient = "";
@@ -210,98 +114,24 @@ public class Client {
             // On demande le nom du client
             System.out.println("\u001b[4mNom du client :\u001b[0m");
             nomClient = scanner.nextLine();
-
+            
             // On envoie le nom au serveur
             if (nomClient.length() > 0) {
-                boolean isNameUsed = false;
                 out.writeUTF(nomClient);
-                try {
-                    isNameUsed = verifPseudoInJson(nomClient);
-                } catch (Exception e) {
-                    System.out.println("Erreur lors de la vérification du nom.");
-                }
-
-                if (isNameUsed) {
+                String isNameUsed = in.readUTF();
+                if (isNameUsed.equals("true")) {
                     // Si le nom est déjà utilisé, on recommence
                     clearTerminal();
                     System.out.println("\u001b[31;1mCe nom est déjà utilisé.\u001b[0m");
-                    out.writeUTF(BibliothequeString.DEMANDE_CONNEXION);
-                    String reponse = in.readUTF();
-                    switch (reponse) {
-                        case BibliothequeString.YES:
-                            // On demande le mots de passe du client
-                            out.writeUTF(BibliothequeString.DEMANDE_MDP);
-                            String mdp = in.readUTF();
-                            try {
-                                boolean isMDPCorrect = verifPseudoInJson(nomClient);
-                            } catch (Exception e) {
-                                System.out.println("Erreur lors de la vérification du nom.");
-                            }
-                            if (isMDPCorrect) {
-                                // On enregistre le nom du client
-                                isNameSet = true;
-                                this.setNameClient(nomClient);
-
-                                // On enregistre le nom du client dans le fichier JSON
-                                clearTerminal();
-
-                                ajouterUtilisateur();
-
-                                System.out.println("\u001b[34;1mNom du client enregistré.\u001b[0m");
-                            } else {
-                                clearTerminal();
-                                System.out.println("\u001b[31;1mMots de passe incorrect.\u001b[0m");                                                              
-
-                            }
-                            break;
-                        case BibliothequeString.NO:
-                            // On recommence au début ou on demande le nom du client
-                            break;
-
-                        default:
-                            break;
-                    }
-
                 } else {
                     // Sinon, on enregistre le nom du client
                     isNameSet = true;
                     this.setNameClient(nomClient);
-
-                    // On enregistre le nom du client dans le fichier JSON
                     clearTerminal();
-
-                    ajouterUtilisateur();
-
                     System.out.println("\u001b[34;1mNom du client enregistré.\u001b[0m");
                 }
             }
         }
-    }
-
-    public void demanderMotsdePasses() throws IOException {
-        clearTerminal();
-        Scanner scanner = new Scanner(System.in);
-
-        // On récupère le nom du client et on vérifie si il est déjà utilisé
-        Boolean isMotsDePasseSet = false;
-        String mostDePasse = "";
-        DataInputStream in = new DataInputStream(this.getSocket().getInputStream());
-        DataOutputStream out = new DataOutputStream(this.getSocket().getOutputStream());
-        while (!isMotsDePasseSet) {
-            // On demande le nom du client
-            System.out.println("\u001b[4mMots de passe :\u001b[0m");
-            mostDePasse = scanner.nextLine();
-
-            if (mostDePasse.length() > 0) {
-                if (mostDePasse.contains(" ")) {
-                    clearTerminal();
-                    System.out.println("\u001b[31;1mLe mots de passe ne doit pas contenir d'espace.\u001b[0m");
-                } else {
-                    isMotsDePasseSet = true;
-                }
-            }
-        }
-        setMotsDePasse(mostDePasse);
     }
 
     @Override
