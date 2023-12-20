@@ -1,5 +1,5 @@
 public class BibliothequeStyle {
-    
+
     public BibliothequeStyle() {
     }
 
@@ -15,4 +15,3 @@ public class BibliothequeStyle {
 
     public static final String SOULIGNAGE = "\u001b[4m";
 }
-

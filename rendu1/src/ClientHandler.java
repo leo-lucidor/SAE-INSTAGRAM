@@ -10,8 +10,6 @@ public class ClientHandler implements Runnable {
     private Client client;
     private List<Client> clients;
     private List<Salon> salons;
-    private String FICHIER_JSON = "message.json";
-    private int LIMITE_MESSAGES = 50;
 
     public ClientHandler(Client client, List<Client> clients, List<Salon> salons) {
         this.client = client;
@@ -22,12 +20,6 @@ public class ClientHandler implements Runnable {
     public void clearTerminalClient(DataOutputStream out) throws IOException {
         out.writeUTF(BibliothequeString.CLEAR);
     }
-
-
-
-    
-
-
 
     public void afficherSalons(DataOutputStream out) throws IOException {
         clearTerminalClient(out);
@@ -48,9 +40,7 @@ public class ClientHandler implements Runnable {
                 + BibliothequeString.VIDE);
     }
 
-    
-
-    public String verifName(DataInputStream in, DataOutputStream out) throws IOException{
+    public String verifName(DataInputStream in, DataOutputStream out) throws IOException {
         // On récupère le nom du client et on vérifie si il est déjà utilisé
         Boolean isNameSet = false;
         String nomClient = "";
@@ -104,7 +94,7 @@ public class ClientHandler implements Runnable {
             String nomClient = verifName(in, out);
             // On demande le nom du salon
             mettreClientDansGlobal(out);
-            
+
             while (true) {
 
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -125,23 +115,21 @@ public class ClientHandler implements Runnable {
                         System.out.println(
                                 " user : " + nomClient + " content : " + message + " date : " + dtf.format(now));
 
-                        // message privé -> on envoie le message uniquement au client mentionné
-                        boolean contientEspace = false;
                         for (int i = 0; i < message.length(); i++) {
                             if (message.charAt(i) == ' ') {
                                 contientEspace = true;
                             }
                         }
-                        
+
                         for (Client client : clients) {
                             Socket keySocket = client.getSocket();
                             if (keySocket != this.client.getSocket()
-                                && client.getSalon().equals(this.client.getSalon())) {
-                                    DataOutputStream out2 = new DataOutputStream(keySocket.getOutputStream());
-                                    out2.writeUTF(msg_a_envoyer);
-                                }
+                                    && client.getSalon().equals(this.client.getSalon())) {
+                                DataOutputStream out2 = new DataOutputStream(keySocket.getOutputStream());
+                                out2.writeUTF(msg_a_envoyer);
                             }
-        
+                        }
+
                         break;
 
                     default:

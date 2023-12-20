@@ -23,8 +23,7 @@ public class ExecutableServer {
         // On crée une liste qui va contenir les salons
         List<Salon> salons = new ArrayList<Salon>();
 
-
-        while(true){
+        while (true) {
             // On attend une connexion d'un client
             Socket socket = serveur.accept();
             System.out.println("Client connecté");

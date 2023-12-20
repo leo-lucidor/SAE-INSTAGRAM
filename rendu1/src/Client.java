@@ -10,7 +10,7 @@ public class Client {
     private String nameClient;
     private String salon;
 
-    public Client(String nameClient){
+    public Client(String nameClient) {
         this.socket = null;
         this.nameClient = nameClient;
         this.salon = "";
@@ -40,11 +40,11 @@ public class Client {
         this.salon = salon;
     }
 
-    public void closeClient(){
-        try{
+    public void closeClient() {
+        try {
             socket.close();
             System.out.println("Client disconnected");
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Error closing client");
         }
     }
@@ -63,7 +63,7 @@ public class Client {
         }
     }
 
-    public void setConnexion(){
+    public void setConnexion() {
         clearTerminal();
         // On se connecte au serveur
         System.out.println("\u001b[4mAdresse IP du serveur :\u001b[0m");
@@ -73,7 +73,7 @@ public class Client {
         int portServeur = scanner.nextInt();
         scanner.nextLine();
 
-        try{
+        try {
             socket = new Socket(ipServeur, portServeur);
             System.out.println("Client connected");
             setSocket(socket);
@@ -86,7 +86,7 @@ public class Client {
         }
     }
 
-    public void startClient() throws IOException{
+    public void startClient() throws IOException {
         clearTerminal();
         // On se connecte au serveur
         setConnexion();
@@ -94,17 +94,17 @@ public class Client {
         miseEnEcoute(new DataInputStream(this.getSocket().getInputStream()));
     }
 
-    public void miseEnEcoute(DataInputStream in){
+    public void miseEnEcoute(DataInputStream in) {
         // On lance un thread qui va écouter les messages du serveur
         Thread t = new Thread(new Affichage(in));
         t.start();
     }
 
-    public void demanderNom() throws IOException{
-        
+    public void demanderNom() throws IOException {
+
         clearTerminal();
         Scanner scanner = new Scanner(System.in);
-        
+
         // On récupère le nom du client et on vérifie si il est déjà utilisé
         Boolean isNameSet = false;
         String nomClient = "";
@@ -114,7 +114,7 @@ public class Client {
             // On demande le nom du client
             System.out.println("\u001b[4mNom du client :\u001b[0m");
             nomClient = scanner.nextLine();
-            
+
             // On envoie le nom au serveur
             if (nomClient.length() > 0) {
                 out.writeUTF(nomClient);
