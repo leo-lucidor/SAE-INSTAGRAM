@@ -2,40 +2,53 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.List;
-import java.time.format.DateTimeFormatter; 
-import java.time.LocalDateTime; 
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
-public class ClientHandler implements Runnable{
+public class ClientHandler implements Runnable {
     private Client client;
     private List<Client> clients;
     private List<Salon> salons;
-    public ClientHandler(Client client, List<Client> clients, List<Salon> salons){
+    private String FICHIER_JSON = "message.json";
+    private int LIMITE_MESSAGES = 50;
+
+    public ClientHandler(Client client, List<Client> clients, List<Salon> salons) {
         this.client = client;
         this.clients = clients;
-        this.salons = salons; 
+        this.salons = salons;
     }
 
-    public void clearTerminalClient(DataOutputStream out) throws IOException{
-        out.writeUTF("clear");
+    public void clearTerminalClient(DataOutputStream out) throws IOException {
+        out.writeUTF(BibliothequeString.CLEAR);
     }
 
-    public void afficherSalons(DataOutputStream out) throws IOException{
+
+
+    
+
+
+
+    public void afficherSalons(DataOutputStream out) throws IOException {
         clearTerminalClient(out);
 
         // On affiche les salons
         if (salons.size() > 0) {
-            out.writeUTF("\u001b[34;1m\u001b[4mSalons disponibles :\u001b[0m");
+            out.writeUTF(BibliothequeStyle.ANSI_CYAN + BibliothequeStyle.SOULIGNAGE
+                    + BibliothequeString.SALON_DISPONIBLE + BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
             for (Salon salon : salons) {
-                out.writeUTF("\u001b[32m-"+salon+"\u001b[0m");
+                out.writeUTF(BibliothequeStyle.ANSI_GREEN + salon + "" + BibliothequeStyle.ANSI_RESET
+                        + BibliothequeString.VIDE);
             }
         } else {
-            out.writeUTF("\u001b[34;1mIl n'y a pas de salon, créez-en un !\u001b[0m");
+            out.writeUTF(BibliothequeStyle.ANSI_CYAN + BibliothequeString.NOTIFICATION_PAS_DE_SALON
+                    + BibliothequeStyle.ANSI_RESET + BibliothequeString.VIDE);
         }
-        out.writeUTF("\u001b[34;1m(si vous faites /quit ici, vous serez déconnecté)\u001b[0m");
+        out.writeUTF("" + BibliothequeStyle.ANSI_CYAN + BibliothequeString.REMARQUE_HELP + BibliothequeStyle.ANSI_RESET
+                + BibliothequeString.VIDE);
     }
 
+    
 
     public String verifName(DataInputStream in, DataOutputStream out) throws IOException{
         // On récupère le nom du client et on vérifie si il est déjà utilisé
@@ -66,120 +79,77 @@ public class ClientHandler implements Runnable{
         return nomClient;
     }
 
-    public void changerSalon(DataInputStream in, DataOutputStream out) throws IOException{
-        // On récupère le nom du salon et on vérifie si il existe
-        // si il existe, on vérifie si le client est déjà dedans
-        // si il n'existe pas, on le crée
-        Boolean isSalonSet = false;
-        String nomSalon = "";
-        afficherSalons(out);
-        // tant que le salon n'est pas défini
-        while (!isSalonSet) {
-            // on récupère le nom du salon
-            nomSalon = in.readUTF();
-
-            // si le nom du salon n'est pas vide
-            if (nomSalon.length() > 0) {
-
-                // si le client envoie /quit on le déconnecte
-                if (nomSalon.equals("/quit")) {
-                    for (Client client : clients) {
-                        if (client.getSocket() == this.client.getSocket()) {
-                            client.getSocket().close();
-                            clients.remove(client);
-                        }
+    public void mettreClientDansGlobal(DataOutputStream out) throws IOException {
+        for (Salon salon : this.salons) {
+            if (salon.getNomSalon().equals("Global")) {
+                for (Client client : clients) {
+                    if (client.getSocket() == this.client.getSocket()) {
+                        client.setSalon("Global");
                     }
                 }
-
-                // si il y existe des salons
-                if (salons.size() > 0) {
-                    //si le salon existe déja
-                    Boolean isSalonExist = false;
-                    for (Salon salon: this.salons){
-                        if (salon.getNomSalon().equals(nomSalon)){
-                            isSalonExist = true;
-                            for (Client client : clients) {
-                                if (client.getSocket() == this.client.getSocket()) {
-                                    client.setSalon(nomSalon);
-                                }
-                            }
-                            isSalonSet = true;
-                            out.writeUTF("tp");
-                        }
-                    }
-                    // si le salon n'existe pas
-                    if (!isSalonExist) {
-                        // on crée le salon
-                        Salon salon = new Salon(nomSalon);
-                        salons.add(salon);
-                        for (Client client : clients) {
-                            if (client.getSocket() == this.client.getSocket()) {
-                                client.setSalon(nomSalon);
-                            }
-                        }
-                        isSalonSet = true;
-                        out.writeUTF("new");
-                    }
-                } else {
-                    // si il n'y a pas de salon
-                    // on crée le salon
-                    Salon salon = new Salon(nomSalon);
-                    salons.add(salon);
-                    for (Client client : clients) {
-                        if (client.getSocket() == this.client.getSocket()) {
-                            client.setSalon(nomSalon);
-                        }
-                    }
-                    isSalonSet = true;
-                    out.writeUTF("new");
-                }
+                out.writeUTF(BibliothequeString.TP);
             }
         }
-        out.writeUTF("\u001b[34;1mVous êtes dans le salon "+nomSalon+"\u001b[0m");
     }
-    
-    public void run(){
+
+    public void run() {
         try {
+
+            // On met le client dans le salon global
+
             DataInputStream in = new DataInputStream(client.getSocket().getInputStream());
             DataOutputStream out = new DataOutputStream(client.getSocket().getOutputStream());
-            
             // On demande le nom du client
-            String nomClient = verifName(in,out);
-            // On demande le nom du salon
-            changerSalon(in,out);
-            
-            while(true){
-                // DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd HH:mm");
 
+            String nomClient = verifName(in, out);
+            // On demande le nom du salon
+            mettreClientDansGlobal(out);
+            
+            while (true) {
+
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
                 LocalDateTime now = LocalDateTime.now();
+                // mettre now en MM/dd HH:mm
+
                 // On lit le message envoyé par le client
                 String message = in.readUTF();
-                if (!message.startsWith("/")) {
-                    String msg_a_envoyer = dtf.format(now)+ " ["+this.client.getSalon()+"] "+nomClient+ " - " + message;
-                    System.out.println(msg_a_envoyer);
+                boolean boolleanSlash = message.startsWith("/");
+                String boolleanString = String.valueOf(boolleanSlash);
 
-                    boolean contientEspace = false;
-                    for (int i=0; i<message.length(); i++) {
-                        if (message.charAt(i) == ' ') {
-                            contientEspace = true;
-                        }
-                    }
-                        // On envoie le message à tous les clients
-                        for (Client client : clients) {
-                            Socket keySocket = client.getSocket();
-                            if (keySocket != this.client.getSocket() && client.getSalon().equals(this.client.getSalon())) {
-                                DataOutputStream out2 = new DataOutputStream(keySocket.getOutputStream());
-                                out2.writeUTF(msg_a_envoyer);
+                switch (boolleanString) {
+                    case "true":
+                        break;
+                    case "false":
+                        String msg_a_envoyer = dtf.format(now) + " | " + nomClient
+                                + " - " + message;
+                        System.out.println(
+                                " user : " + nomClient + " content : " + message + " date : " + dtf.format(now));
+
+                        // message privé -> on envoie le message uniquement au client mentionné
+                        boolean contientEspace = false;
+                        for (int i = 0; i < message.length(); i++) {
+                            if (message.charAt(i) == ' ') {
+                                contientEspace = true;
                             }
                         }
-                    }
-                else{
-                    // mettre les commande
+                        
+                        for (Client client : clients) {
+                            Socket keySocket = client.getSocket();
+                            if (keySocket != this.client.getSocket()
+                                && client.getSalon().equals(this.client.getSalon())) {
+                                    DataOutputStream out2 = new DataOutputStream(keySocket.getOutputStream());
+                                    out2.writeUTF(msg_a_envoyer);
+                                }
+                            }
+        
+                        break;
+
+                    default:
+                        break;
                 }
             }
         } catch (IOException e) {
-            System.out.println("Un client vient de se déconnecter.");
+            System.out.println(BibliothequeString.NOTIFICATION_DECONNEXION);
             for (Client client : clients) {
                 Socket keySocket = client.getSocket();
                 if (keySocket == this.client.getSocket()) {
@@ -188,7 +158,7 @@ public class ClientHandler implements Runnable{
                 }
             }
         } catch (Exception e) {
-            System.out.println("Un client vient de se déconnecter.");
+            System.out.println(BibliothequeString.NOTIFICATION_ERREUR_THREAD);
         }
     }
 }
