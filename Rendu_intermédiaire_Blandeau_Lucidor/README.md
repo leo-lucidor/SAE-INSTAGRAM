@@ -79,7 +79,4 @@ UML du projet avec les fonctionnalités à venir : [UML](./uml/Diagramme_future.
 ## Conclusion
 Nous avons réussi à faire fonctionner le serveur et le client, ce qui etait donc demandé dans le premier rendu. Nous avons pu tester les fonctionnalités de base du serveur et du client. Nous avons rencontré des difficultés au début du projet mais nous avons réussi à les surmonter. Nous avons pu mettre en place une architecture qui nous permettra d'ajouter des fonctionnalités supplémentaires par la suite.
 
-## Sources
-
-
 

@@ -99,7 +99,6 @@ public class ClientHandler implements Runnable {
 
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
                 LocalDateTime now = LocalDateTime.now();
-                // mettre now en MM/dd HH:mm
 
                 // On lit le message envoyé par le client
                 String message = in.readUTF();

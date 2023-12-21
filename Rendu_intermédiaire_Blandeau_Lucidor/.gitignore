@@ -3,7 +3,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudiocode,java
 
 ### Java ###
-# Compiled class file
+# Compiled class file   
 *.class
 
 # Log file
