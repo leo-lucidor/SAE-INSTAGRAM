@@ -170,7 +170,25 @@ public class Client {
         return false;
     }
 
-
+    public boolean verifMDPInJson(String pseudo, String mdp) throws JSONException {
+        String FICHIER_JSON = "connexion.json";
+        JSONArray utilisateursExistants = new JSONArray();
+        try {
+            String contenuFichier = new String(Files.readAllBytes(Paths.get(FICHIER_JSON)));
+            utilisateursExistants = new JSONArray(contenuFichier);
+        } catch (IOException e) {
+            // Le fichier n'existe probablement pas encore, c'est acceptable.
+        }
+        for (int i = 0; i < utilisateursExistants.length(); i++) {
+            JSONObject utilisateur = utilisateursExistants.getJSONObject(i);
+            String pseudoJson = utilisateur.getString("pseudo");
+            String mdpJson = utilisateur.getString("motsDePasse");
+            if (pseudoJson.equals(pseudo) && mdpJson.equals(mdp)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void ajouterUtilisateur() {
         String FICHIER_JSON = "connexion.json";
@@ -209,25 +227,28 @@ public class Client {
         }
     }
 
+
     public void demanderNom() throws IOException {
 
         clearTerminal();
         Scanner scanner = new Scanner(System.in);
 
-        // On récupère le nom du client et on vérifie si il est déjà utilisé
-        Boolean isNameSet = false;
+        // On récupère le nom du client et on vérifie s'il est déjà utilisé
+        boolean isNameUsed = false;
+        boolean isNameSet = false;
         String nomClient = "";
         DataInputStream in = new DataInputStream(this.getSocket().getInputStream());
         DataOutputStream out = new DataOutputStream(this.getSocket().getOutputStream());
+
         while (!isNameSet) {
-            // On demande le nom du client
-            System.out.println("\u001b[4mNom du client :\u001b[0m");
-            nomClient = scanner.nextLine();
+            if (!isNameUsed) {
+                // On demande le nom du client
+                System.out.println("\u001b[4mNom du client :\u001b[0m");
+                nomClient = scanner.nextLine();
+            }
 
             // On envoie le nom au serveur
             if (nomClient.length() > 0) {
-                boolean isNameUsed = false;
-                out.writeUTF(nomClient);
                 try {
                     isNameUsed = verifPseudoInJson(nomClient);
                 } catch (Exception e) {
@@ -235,57 +256,47 @@ public class Client {
                 }
 
                 if (isNameUsed) {
-                    // Si le nom est déjà utilisé, on recommence
+                    // Si le nom est déjà utilisé
                     clearTerminal();
-                    System.out.println("\u001b[31;1mCe nom est déjà utilisé.\u001b[0m");
-                    out.writeUTF(BibliothequeString.DEMANDE_CONNEXION);
-                    String reponse = in.readUTF();
+                    System.out.println("Veux tu te connecter (O/N)");
+                    String reponse = scanner.nextLine();
                     switch (reponse) {
-                        case BibliothequeString.YES:
-                            boolean isMDPCorrect = false ;
-                            // On demande le mots de passe du client
-                            out.writeUTF(BibliothequeString.DEMANDE_MDP);
-                            String mdp = in.readUTF();
+                        case "O":
+                            boolean isMDPCorrect = false;
+                            System.out.println("Merci de saisir votre mot de passe :");
+                            String mdp = scanner.nextLine();
                             try {
-                                isMDPCorrect = verifPseudoInJson(nomClient);
+                                isMDPCorrect = verifMDPInJson(nomClient, mdp);
                             } catch (Exception e) {
-                                System.out.println("Erreur lors de la vérification du nom.");
+                                System.out.println("Erreur lors de la vérification du mot de passe.");
                             }
                             if (isMDPCorrect) {
                                 // On enregistre le nom du client
                                 isNameSet = true;
+                                out.writeUTF(nomClient);
                                 this.setEstConnecte(true);
                                 this.setNameClient(nomClient);
-                                System.out.println(getEstConnecte());
-
                                 // clearTerminal();
-
-
-                                System.out.println("\u001b[34;1mNom du client enregistré.\u001b[0m");
                             } else {
                                 // clearTerminal();
-                                System.out.println("\u001b[31;1mMots de passe incorrect.\u001b[0m");                                                              
-
+                                System.out.println("\u001b[31;1mMot de passe incorrect.\u001b[0m");
                             }
                             break;
-                        case BibliothequeString.NO:
+                        case "N":
                             // On recommence au début ou on demande le nom du client
+                            isNameUsed = false; // Réinitialiser la vérification du nom
                             break;
-
                         default:
                             break;
                     }
-
                 } else {
-                    // Sinon, on enregistre le nom du client
+                    // Le nom n'est pas utilisé, on enregistre le nom du client
                     isNameSet = true;
                     this.setNameClient(nomClient);
                     setEstConnecte(true);
                     System.out.println(getEstConnecte());
 
-                    // On enregistre le nom du client dans le fichier JSON
-                    // clearTerminal();
-
+                    // Ajouter la logique pour ajouter l'utilisateur dans le fichier JSON
                     ajouterUtilisateur();
 
                     System.out.println("\u001b[34;1mNom du client enregistré.\u001b[0m");
@@ -319,6 +330,7 @@ public class Client {
         }
         setMotsDePasse(mostDePasse);
     }
+
 
     @Override
     public String toString() {

@@ -10,14 +10,6 @@ import org.json.JSONObject;
 
 public class ExecutableClient {
 
-    
-    
-    
-    
-
-    
-
-
     public static void main(String[] args) throws IOException {
         Scanner sc = new Scanner(System.in);
         Client client1 = new Client("");
