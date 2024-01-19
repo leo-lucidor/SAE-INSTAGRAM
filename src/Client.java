@@ -120,6 +120,7 @@ public class Client {
         // On se connecte au serveur
         setConnexion();
         demanderNom();
+        clearTerminal();
         miseEnEcoute(new DataInputStream(this.getSocket().getInputStream()));
     }
 

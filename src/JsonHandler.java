@@ -432,6 +432,67 @@ public class JsonHandler {
         }
     }
 
+    public String getMessageWithIdmessageInJson(int idMessage){
+        String message = "";
+        try {
+            // Lecture du contenu du fichier JSON dans une chaîne
+            String contenuFichier = new String(Files.readAllBytes(Paths.get("message.json")));
+
+            // Création d'un objet JSON à partir de la chaîne lue
+            JSONArray messagesExistants = new JSONArray(contenuFichier);
+
+            boolean messageExiste = false;
+
+            for (int i = 0; i < messagesExistants.length(); i++) {
+                JSONObject obj = messagesExistants.getJSONObject(i);
+                // on parcours le data de chaque objet
+                JSONArray dataObj = obj.getJSONArray("data");
+                for (int j = 0; j < dataObj.length(); j++){
+                    JSONObject messageObj = dataObj.getJSONObject(j);
+                    if (messageObj.getInt("idMessage") == idMessage && messageExiste == false){
+                        message = messageObj.getString("contenu");
+                        messageExiste = true;
+                    }
+                }
+            }
+
+            if (messageExiste){
+                return message;
+            } else {
+                return "Le message n'existe pas";
+            }
+        } catch (Exception e) {
+            System.out.println("Erreur lors de la lecture du fichier JSON : " + e.getMessage());
+            return "Erreur lors de la lecture du fichier JSON : " + e.getMessage();
+        }
+    }
+
+    public String getListSuivi(String nomClient){
+        String listSuivi = "";
+        try {
+            int idnomClient = trouverIdUtilisateurParPseudo(nomClient);
+            // Lecture du contenu du fichier JSON dans une chaîne
+            String contenuFichier = new String(Files.readAllBytes(Paths.get("message.json")));
+
+            // Création d'un objet JSON à partir de la chaîne lue
+            JSONArray messagesExistants = new JSONArray(contenuFichier);
+
+            for (int i = 0; i < messagesExistants.length(); i++) {
+                JSONObject obj = messagesExistants.getJSONObject(i);
+                // on parcours le data de chaque objet
+                if (obj.getInt("idUtilisateur") == idnomClient){
+                    JSONArray followersObj = obj.getJSONArray("followers");
+                    for (int j = 0; j < followersObj.length(); j++){
+                        listSuivi += followersObj.getString(j) + "\n";
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Erreur lors de la lecture du fichier JSON : " + e.getMessage());
+        }
+        return listSuivi;
+    }
+
     // public boolean veridMotsDePasseInJson(String motsDePasse) {
     //     boolean verid = false;
     //     try {

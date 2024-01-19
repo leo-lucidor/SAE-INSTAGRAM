@@ -13,5 +13,10 @@
         "idUtilisateur": 3,
         "motsDePasse": "test\u001b[3~",
         "pseudo": "test"
+    },
+    {
+        "idUtilisateur": 4,
+        "motsDePasse": "leo",
+        "pseudo": "towkyo"
     }
 ]

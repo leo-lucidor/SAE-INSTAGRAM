@@ -220,7 +220,24 @@ public class ClientHandler implements Runnable {
                     }
 
                     if (message.startsWith("/get")){
-                        // arret ici
+                        int indexOfSlash = message.indexOf("/");
+                        int indexOfSpace = message.indexOf(" ");
+                        int idMessage = Integer.parseInt(message.substring(indexOfSlash + 5));
+                        DataOutputStream out4 = new DataOutputStream(client.getSocket().getOutputStream());
+                        String msg_a_envoyer = this.jsonHandler.getMessageWithIdmessageInJson(idMessage);
+                        out4.writeUTF(msg_a_envoyer);
+                    }
+
+                    if(message.startsWith("/help")){
+                        DataOutputStream out4 = new DataOutputStream(client.getSocket().getOutputStream());
+                        String msg_a_envoyer = BibliothequeStyle.ANSI_RED+"\n Commandes disponibles :"+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_BLUE+"\n \n /like <idMessage> :"+BibliothequeStyle.ANSI_CYAN+" permet de liker un message "+BibliothequeStyle.ANSI_RESET+"\n"+BibliothequeStyle.ANSI_BLUE+" /nblike <idMessage> : "+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_CYAN+" permet de connaitre le nombre de like d'un message "+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_BLUE+"\n /follow <pseudo> :"+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_CYAN+" permet de suivre un utilisateur"+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_BLUE+" \n /unfollow <pseudo> : "+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_CYAN+" permet de ne plus suivre un utilisateur \n"+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_BLUE+" /delete <idMessage> :"+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_CYAN+" permet de supprimer un message \n "+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_BLUE+"/get <idMessage> : "+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_CYAN+"permet de récupérer un message \n"+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_BLUE+" /help :"+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_CYAN+" permet d'afficher les commandes disponibles"+BibliothequeStyle.ANSI_RESET;
+                        out4.writeUTF(msg_a_envoyer);
+                    }
+
+                    if(message.startsWith("/suivi")){
+                        DataOutputStream out4 = new DataOutputStream(client.getSocket().getOutputStream());
+                        String msg_a_envoyer = "Vous suivez : " + this.getListSuivi(this.client.getNameClient());
+                        out4.writeUTF(msg_a_envoyer);
                     }
 
 
