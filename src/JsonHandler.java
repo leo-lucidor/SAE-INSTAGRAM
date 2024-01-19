@@ -301,9 +301,9 @@ public class JsonHandler {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    return "Vous suivez désormais " + nomFollowed;
+                    return BibliothequeStyle.ANSI_RED+"Vous suivez désormais " + BibliothequeStyle.ANSI_RESET + BibliothequeStyle.ANSI_BLUE + nomFollowed + BibliothequeStyle.ANSI_RESET;
                 }
-                return "Vous suivez déjà " + nomFollowed;
+                return BibliothequeStyle.ANSI_RED + "Vous suivez déjà " + BibliothequeStyle.ANSI_RESET + BibliothequeStyle.ANSI_BLUE + nomFollowed + BibliothequeStyle.ANSI_RESET;
 
                 }
             }
@@ -362,9 +362,9 @@ public class JsonHandler {
                         }
                     
                     if (!followerExists) {
-                        res = "Vous ne suivez plus " + nomFollowed;
+                        res = BibliothequeStyle.ANSI_RED+"Vous ne suivez plus " + BibliothequeStyle.ANSI_RESET+ BibliothequeStyle.ANSI_BLUE + nomFollowed+BibliothequeStyle.ANSI_RESET;
                     }else{
-                        res = "Vous ne suiviez pas " + nomFollowed;
+                        res = BibliothequeStyle.ANSI_RED+"Vous ne suiviez pas " + BibliothequeStyle.ANSI_RESET + BibliothequeStyle.ANSI_BLUE + nomFollowed+BibliothequeStyle.ANSI_RESET;
                         }
                     
                     
@@ -422,9 +422,9 @@ public class JsonHandler {
             }
 
             if (messageExiste){
-                return "Le message a bien été supprimé";
+                return BibliothequeStyle.ANSI_RED+"Le message a bien été supprimé"+BibliothequeStyle.ANSI_RESET;
             } else {
-                return "Le message ne vous appartient pas ou n'existe pas";
+                return BibliothequeStyle.ANSI_RED+"Le message ne vous appartient pas ou n'existe pas"+BibliothequeStyle.ANSI_RESET;
             }
         } catch (Exception e) {
             System.out.println("Erreur lors de la lecture du fichier JSON : " + e.getMessage());
@@ -457,9 +457,9 @@ public class JsonHandler {
             }
 
             if (messageExiste){
-                return message;
+                return BibliothequeStyle.ANSI_BLUE+ message+ BibliothequeStyle.ANSI_RESET;
             } else {
-                return "Le message n'existe pas";
+                return BibliothequeStyle.ANSI_RED+"Le message n'existe pas"+BibliothequeStyle.ANSI_RESET;
             }
         } catch (Exception e) {
             System.out.println("Erreur lors de la lecture du fichier JSON : " + e.getMessage());

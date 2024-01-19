@@ -160,7 +160,7 @@ public class ClientHandler implements Runnable {
                                 int indexOfSpace = message.indexOf(" ");
 
                                 int idMessage = Integer.parseInt(message.split(" ")[1]);
-                                String msg_a_envoyer = " Vous avez liké le message n°" + message.substring(indexOfSpace + 1);
+                                String msg_a_envoyer = BibliothequeStyle.ANSI_RED+" Vous avez liké le message n°" + message.substring(indexOfSpace + 1)+ BibliothequeStyle.ANSI_RESET;
                                 
                                 for (Client client : clients) {
                                         Socket keySocket = client.getSocket();
@@ -181,7 +181,7 @@ public class ClientHandler implements Runnable {
                         int indexOfSpace = message.indexOf(" ");
                         int idMessage = Integer.parseInt(message.split(" ")[1]);
                         DataOutputStream out4 = new DataOutputStream(client.getSocket().getOutputStream());
-                        String msg_a_envoyer = "Le nombre de like du message n°" + idMessage + " est de : " + this.jsonHandler.nbLikeMessageInJson(idMessage);
+                        String msg_a_envoyer = BibliothequeStyle.ANSI_RED+"Le nombre de like du message n°" + idMessage + " est de : "+ BibliothequeStyle.ANSI_RESET + BibliothequeStyle.ANSI_BLUE + this.jsonHandler.nbLikeMessageInJson(idMessage)+ BibliothequeStyle.ANSI_RESET;
                         out4.writeUTF(msg_a_envoyer);
 
                     }
@@ -250,9 +250,9 @@ public class ClientHandler implements Runnable {
                         int nouvelIdMessage = this.jsonHandler.obtenirNouvelIdMessage();
                         this.jsonHandler.ajouterMessage(nouvelIdMessage, message, now, id, null);
 
-                        String msg_a_envoyer = dtf.format(now) + " [" + this.client.getSalon() + "] | [ID Message : " + nouvelIdMessage + "] " + nomClient + " : " + message;
+                        String msg_a_envoyer = BibliothequeStyle.ANSI_GREEN + dtf.format(now) + BibliothequeStyle.ANSI_RESET + BibliothequeStyle.ANSI_RED + " [" + this.client.getSalon() + "]"+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_GREEN+" | "+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_RED+"[ID Message : " + nouvelIdMessage + "] "+ BibliothequeStyle.ANSI_RESET + BibliothequeStyle.ANSI_BLUE + nomClient + " : " + BibliothequeStyle.ANSI_RESET + BibliothequeStyle.ANSI_CYAN + message + BibliothequeStyle.ANSI_RESET;
                         // On enregistre le message dans le fichier JSON
-                        System.out.println(" user : " + nomClient + " content : " + message + " date : " + dtf.format(now));
+                        System.out.println(BibliothequeStyle.ANSI_RED+" user : "+ nomClient + ", "+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_BLUE+"contenu du message : " + message + ", "+BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_GREEN+"date : " + dtf.format(now)+BibliothequeStyle.ANSI_RESET);
 
 
                         // message privé -> on envoie le message uniquement au client mentionné
@@ -267,8 +267,8 @@ public class ClientHandler implements Runnable {
                             for (Client client : clients) {
                                 if (pseudo.equals(client.getNameClient())) {
                                     DataOutputStream out3 = new DataOutputStream(client.getSocket().getOutputStream());
-                                    out3.writeUTF("MP" + this.client.getNameClient() + " vous chuchotte : "
-                                            + message.substring(message.indexOf(" ") + 1));
+                                    out3.writeUTF(BibliothequeStyle.ANSI_RED+"MP" + this.client.getNameClient() + BibliothequeStyle.ANSI_RESET+BibliothequeStyle.ANSI_BLUE+" vous chuchotte : "
+                                            + message.substring(message.indexOf(" ") + 1)+ BibliothequeStyle.ANSI_RESET);
                                 }
                             }
                         } else {
