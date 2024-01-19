@@ -94,9 +94,9 @@ public class Client {
         // On se connecte au serveur
         System.out.println("\u001b[4mAdresse IP du serveur :\u001b[0m");
         Scanner scanner = new Scanner(System.in);
-        // String ipServeur = scanner.nextLine();
-        String ipServeur = "localhost";
+        String ipServeur = scanner.nextLine();
 
+        clearTerminal();
 
         System.out.println("\u001b[4mPort du serveur :\u001b[0m");
         int portServeur = scanner.nextInt();
@@ -261,6 +261,7 @@ public class Client {
                     clearTerminal();
                     System.out.println("Veux tu te connecter (O/N)");
                     String reponse = scanner.nextLine();
+                    clearTerminal();
                     switch (reponse) {
                         case "O":
                             boolean isMDPCorrect = false;
