@@ -1,0 +1,11 @@
+{
+    "java.project.sourcePaths": [
+        "jar",
+        "src"
+    ],
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "jar\\json-20230618.jar",
+        "jar\\org.json.jar"
+    ]
+}

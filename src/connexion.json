@@ -1,0 +1,22 @@
+[
+    {
+        "idUtilisateur": 1,
+        "motsDePasse": "erwan",
+        "pseudo": "erwan"
+    },
+    {
+        "idUtilisateur": 2,
+        "motsDePasse": "leo",
+        "pseudo": "leo"
+    },
+    {
+        "idUtilisateur": 3,
+        "motsDePasse": "test\u001b[3~",
+        "pseudo": "test"
+    },
+    {
+        "idUtilisateur": 4,
+        "motsDePasse": "leo",
+        "pseudo": "towkyo"
+    }
+]
